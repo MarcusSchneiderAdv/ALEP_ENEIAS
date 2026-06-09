@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard Analítico — ALEP PR 2026 (V6)</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="DADOS_ALEP_20.js"></script>
+  <style>
+    :root {
+      --bg: #0b0d11;
+      --card: #151921;
+      --card2: #1e2430;
+      --border: #2a313d;
+      --accent: #6c63ff;
+      --accent-glow: rgba(108, 99, 255, 0.3);
+      --accent2: #00d4aa;
+      --accent3: #ff6b6b;
+      --text: #e2e8f0;
+      --muted: #8892a4;
+      --gold: #f5a623;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; min-height: 100vh; overflow-x: hidden; }
+
+    header {
+      background: linear-gradient(135deg, #151921 0%, #0d0f1a 100%);
+      border-bottom: 1px solid var(--border);
+      padding: 1.5rem 2.5rem;
+      display: flex; align-items: center; justify-content: space-between;
+      position: sticky; top: 0; z-index: 100; backdrop-filter: blur(10px);
+    }
+    .header-left { display: flex; align-items: center; gap: 1rem; }
+    .header-left .logo { font-size: 2.2rem; }
+    .header-left h1 { font-size: 1.5rem; font-weight: 700; background: linear-gradient(90deg, #fff, var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .header-left p { font-size: 0.8rem; color: var(--muted); margin-top: 2px; }
+    .version-tag { background: var(--accent); color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; margin-left: 10px; }
+
+    main { max-width: 1500px; margin: 0 auto; padding: 2rem; }
+
+    /* KPIs */
+    .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1.2rem; margin-bottom: 2.5rem; }
+    .kpi {
+      background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 1.4rem; 
+      position: relative; overflow: hidden; transition: transform 0.3s, border-color 0.3s;
+    }
+    .kpi:hover { transform: translateY(-5px); border-color: var(--accent); }
+    .kpi .label { font-size: 0.7rem; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
+    .kpi .value { font-size: 2rem; font-weight: 800; color: var(--text); margin-top: 0.4rem; }
+    .kpi .sub { font-size: 0.75rem; color: var(--accent2); margin-top: 0.2rem; font-weight: 500; }
+    .kpi::after { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: var(--accent); opacity: 0.5; }
+    .kpi.green::after { background: var(--accent2); }
+    .kpi.gold::after { background: var(--gold); }
+
+    /* Filters */
+    .filter-bar {
+      background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 1.2rem; margin-bottom: 2rem;
+      display: flex; flex-wrap: wrap; gap: 1.5rem; align-items: flex-end;
+    }
+    .filter-group { display: flex; flex-direction: column; gap: 0.5rem; flex: 1; min-width: 200px; }
+    .filter-group label { font-size: 0.75rem; color: var(--muted); font-weight: 600; text-transform: uppercase; }
+    .filter-group input, .filter-group select {
+      background: var(--bg); border: 1px solid var(--border); color: white; padding: 0.8rem 1rem; border-radius: 10px; font-family: inherit; outline: none; transition: all 0.2s;
+    }
+    .filter-group input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
+
+    /* Charts Row */
+    .charts-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 1.5rem; margin-bottom: 2.5rem; }
+    .chart-card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 1.5rem; min-height: 450px; display: flex; flex-direction: column; }
+    .chart-card h3 { font-size: 0.9rem; color: var(--muted); margin-bottom: 1.5rem; text-transform: uppercase; letter-spacing: 1px; }
+    .chart-wrap { flex: 1; position: relative; min-height: 350px; }
+
+    /* Table */
+    .data-section { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 1.5rem; position: relative; }
+    .table-container { overflow-x: auto; margin-top: 1rem; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+    th { text-align: left; padding: 1rem; color: var(--muted); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; border-bottom: 2px solid var(--border); cursor: pointer; transition: all 0.2s; position: relative; }
+    th:hover { color: var(--accent); background: rgba(108, 99, 255, 0.05); }
+    th:hover::after { content: ' ↓'; position: absolute; right: 5px; opacity: 0.5; }
+    td { padding: 1.2rem 1rem; border-bottom: 1px solid var(--border); transition: background 0.2s; }
+    tr:hover td { background: var(--card2); }
+    
+    .dep-name-cell { display: flex; align-items: center; gap: 0.8rem; }
+    .dep-name { font-weight: 700; cursor: pointer; color: var(--accent); }
+    .dep-name:hover { text-decoration: underline; }
+    .dep-party { background: var(--card2); border-radius: 20px; padding: 2px 8px; font-weight: 700; font-size: 0.7rem; color: var(--gold); border: 1px solid var(--border); }
+
+    /* Detailed View Modal-ish */
+    #detailsPanel {
+      position: fixed; top: 0; right: -100%; width: 50%; height: 100vh; background: var(--card); z-index: 1001;
+      box-shadow: -10px 0 40px rgba(0,0,0,0.8); border-left: 1px solid var(--border);
+      transition: right 0.4s cubic-bezier(0.19, 1, 0.22, 1); padding: 2.5rem; overflow-y: auto;
+    }
+    #detailsPanel.open { right: 0; }
+    .close-btn { position: sticky; top: -1.5rem; float: right; width: 3rem; height: 3rem; background: var(--accent); border: none; border-radius: 50%; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; box-shadow: 0 4px 15px rgba(0,0,0,0.3); z-index: 10; margin-bottom: -3rem; }
+    
+    .details-header { margin-bottom: 2rem; border-bottom: 1px solid var(--border); padding-bottom: 1.5rem; display: flex; flex-direction: column; gap: 1rem; }
+    .details-header h2 { font-size: 2rem; margin-bottom: 0.5rem; }
+    
+    .prop-item { background: var(--card2); border: 1px solid var(--border); border-radius: 12px; padding: 1.2rem; margin-bottom: 1rem; transition: background 0.2s; }
+    .prop-item.highlight { background: rgba(0, 212, 170, 0.1); border-color: var(--accent2); }
+    .prop-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem; }
+    .prop-badge { font-size: 0.65rem; font-weight: 800; background: var(--accent); color: white; padding: 3px 8px; border-radius: 4px; text-transform: uppercase; }
+    .prop-status { font-size: 0.65rem; color: var(--gold); border: 1px solid var(--gold); padding: 2px 7px; border-radius: 4px; text-transform: uppercase; }
+    .prop-theme { font-size: 0.6rem; color: var(--accent3); border: 1px solid var(--accent3); padding: 2px 5px; border-radius: 4px; text-transform: uppercase; margin-left: 5px; }
+    .prop-date { font-size: 0.75rem; color: var(--muted); }
+    .prop-ementa { font-size: 0.85rem; line-height: 1.5; color: var(--text); margin-bottom: 1rem; }
+
+    /* Timeline */
+    .timeline { margin-top: 15px; border-left: 2px solid var(--accent); padding-left: 20px; font-size: 0.8rem;}
+    .timeline-item { margin-bottom: 10px; position: relative; }
+    .timeline-item:before {
+        content: ''; position: absolute; left: -25px; top: 4px;
+        width: 8px; height: 8px; background: var(--accent);
+        border-radius: 50%; border: 2px solid var(--card2);
+    }
+    .t-date { color: var(--accent2); font-weight: 600; font-size: 0.7rem;}
+
+    /* Overlay */
+    #overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: none; z-index: 999; backdrop-filter: blur(4px); }
+    #overlay.open { display: block; }
+
+    footer { padding: 3rem; text-align: center; color: var(--muted); font-size: 0.8rem; }
+
+    .btn-perfil { background: var(--border); color: var(--text); padding: 8px 16px; border-radius: 8px; text-decoration: none; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 8px; transition: 0.2s; border: 1px solid transparent; }
+    .btn-perfil:hover { background: var(--card2); border-color: var(--accent); color: white; }
+
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--muted); }
+
+    @media (max-width: 1000px) {
+      #detailsPanel { width: 90%; }
+      .header-left h1 { font-size: 1.2rem; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="overlay" onclick="closeDetails()"></div>
+<div id="detailsPanel">
+  <button class="close-btn" onclick="closeDetails()">×</button>
+  <div id="detailsContent"></div>
+</div>
+
+<header>
+  <div class="header-left">
+    <div class="logo">🏛️</div>
+    <div>
+      <h1>Parlamento PR Analítico <span class="version-tag">V6</span></h1>
+      <p id="subHeader">Foco: 20ª Legislatura (2023–2026)</p>
+    </div>
+  </div>
+</header>
+
+<main>
+  <!-- KPIs -->
+  <div class="kpi-grid">
+    <div class="kpi" id="kpiDep">
+      <div class="label">Parlamentares Ativos</div>
+      <div class="value" id="val-dep">—</div>
+    </div>
+    <div class="kpi" id="kpiProd">
+      <div class="label">Proposições</div>
+      <div class="value" id="val-prop">—</div>
+      <div class="sub">Produção Legislativa da ALEP</div>
+    </div>
+    <div class="kpi gold" id="kpiMen">
+      <div class="label">Menções Honrosas</div>
+      <div class="value" id="val-men">—</div>
+      <div class="sub">Acompanhamento e Liderança</div>
+    </div>
+    <div class="kpi green" id="kpiLeis">
+      <div class="label">Leis Aprovadas</div>
+      <div class="value" id="val-leis">—</div>
+      <div class="sub">Mandato Consolidado</div>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="filter-bar">
+    <div class="filter-group">
+      <label>Buscar Parlamentar</label>
+      <input type="text" id="mainSearch" placeholder="Nome do deputado..." oninput="renderTable()">
+    </div>
+    <div class="filter-group">
+      <label>Partido</label>
+      <select id="partyFilter" onchange="renderTable()">
+        <option value="ALL">Todos os Partidos</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label>Ordenar Por</label>
+      <select id="sortKey" onchange="renderTable()">
+        <option value="leis_count">Leis Aprovadas</option>
+        <option value="proposicoes_count">Produtividade Total</option>
+        <option value="projetos_lei">Projetos de Lei (PLs)</option>
+        <option value="requerimentos">Requerimentos</option>
+        <option value="mencoes_honrosas">Menções Honrosas</option>
+      </select>
+    </div>
+    <div class="filter-group" style="max-width: 150px;">
+      <label>Exibir</label>
+      <select id="pageSize" onchange="renderTable()">
+        <option value="15">15 itens</option>
+        <option value="30">30 itens</option>
+        <option value="999">Todos</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Charts Row -->
+  <div class="charts-grid">
+    <div class="chart-card">
+      <h3>Distribuição por Tipo de Proposição</h3>
+      <div class="chart-wrap"><canvas id="chartTipos"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <h3>Produtividade por Partido (Proposições x Leis)</h3>
+      <div class="chart-wrap"><canvas id="chartPartidos"></canvas></div>
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div class="data-section">
+    <h3 id="tableCount" style="color:var(--muted); font-size: 0.9rem; margin-bottom: 1rem;">Exibindo 0 parlamentares</h3>
+    <div class="table-container">
+      <table id="mainTable">
+        <thead>
+          <tr>
+            <th onclick="changeSort('nome')">Parlamentar</th>
+            <th onclick="changeSort('proposicoes_count')">Proposições</th>
+            <th onclick="changeSort('projetos_lei')">PLs</th>
+            <th onclick="changeSort('requerimentos')">Requerimentos</th>
+            <th onclick="changeSort('mencoes_honrosas')">Menções</th>
+            <th onclick="changeSort('leis_count')">Leis Aprovadas</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+  </div>
+</main>
+
+<footer>
+    <div style="margin-bottom: 0.5rem;">Fontes de Dados: Portal da Transparência (ALEP PR) & Atividade Parlamentar Oficial</div>
+    <div style="font-size: 0.65rem; color: var(--muted);">Dados processados ref. 20ª Legislatura (2023-2025) · Atualizado em Março/2026</div>
+</footer>
+
+<script>
+// ─── LÓGICA DE DADOS ─────────────────────────────────
+
+let chartA = null;
+let chartB = null;
+let deputadosProcessados = [];
+let temasRequerimentosGlobal = new Set();
+
+const CORES = [
+  '#6c63ff', '#00d4aa', '#ff6b6b', '#f5a623', '#36a2eb',
+  '#9966ff', '#4bc0c0', '#ff9f40', '#ff6384', '#c9cbcf'
+];
+
+function prepararDados() {
+    // Filtra institucionais
+    const institucional = ["PODER EXECUTIVO", "COMISSÃO", "MESA EXECUTIVA", "TRIBUNAL", "MINISTÉRIO", "DEFENSORIA"];
+    let raw = DADOS.filter(d => !institucional.some(i => d.nome.includes(i)));
+
+    // Processa estatísticas extras baseadas na lista de proposições
+    deputadosProcessados = raw.map(dep => {
+        let projetos_lei = 0;
+        let requerimentos = 0;
+        let mencoes_honrosas = 0;
+
+        dep.proposicoes_lista.forEach(p => {
+            const tipo = p.tipo.toUpperCase();
+            const ementa = (p.ementa || '').toUpperCase();
+            let tema = p.tema ? p.tema.toUpperCase() : "OUTROS";
+            p.temaFormatado = tema;
+            
+            if (tipo.includes("PROJETO DE LEI")) {
+                projetos_lei++;
+            } else if (tipo.includes("REQUERIMENTO")) {
+                requerimentos++;
+                temasRequerimentosGlobal.add(tema);
+                
+                // Lógica de menções honrosas aprimorada
+                if (ementa.includes("MENÇÃO HONROSA") || ementa.includes("CONGRATULAÇÕES") || ementa.includes("LOUVOR") || ementa.includes("PESAR")) {
+                    mencoes_honrosas++;
+                }
+            }
+        });
+
+        return {
+            ...dep,
+            projetos_lei,
+            requerimentos,
+            mencoes_honrosas
+        };
+    });
+}
+
+function updateKPIs() {
+    let propTot = 0;
+    let leisTot = 0;
+    let menTot = 0;
+
+    deputadosProcessados.forEach(d => {
+        propTot += d.proposicoes_count;
+        leisTot += d.leis_count;
+        menTot += d.mencoes_honrosas;
+    });
+
+    document.getElementById('val-dep').innerText = deputadosProcessados.length;
+    document.getElementById('val-prop').innerText = propTot.toLocaleString('pt-BR');
+    document.getElementById('val-leis').innerText = leisTot.toLocaleString('pt-BR');
+    document.getElementById('val-men').innerText = menTot.toLocaleString('pt-BR');
+}
+
+function populateFilters() {
+    const partySet = new Set(deputadosProcessados.map(d => d.partido));
+    const sel = document.getElementById('partyFilter');
+    Array.from(partySet).sort().forEach(p => {
+        const o = document.createElement('option');
+        o.value = p; o.text = p;
+        sel.appendChild(o);
+    });
+}
+
+// ─── HELPER FUNCION ──────────────────────────────────
+// Mapa fixo de slugs verificados (deputados cujo nome parlamentar diverge do slug ALEP)
+const PERFIL_SLUGS_FIXOS = {
+    "PROFESSOR LEMOS": "professor-lemos",
+    "CANTORA MARA LIMA": "cantora-mara-lima",
+    "ARILSON CHIORATO": "arilson-maroldi-chiorato",
+    "ARILSON MAROLDI CHIORATO": "arilson-maroldi-chiorato",
+    "DELEGADO JACOVÓS": "delegado-jacovos",
+    "BAZANA": "pedro-paulo-bazana",
+    "PEDRO PAULO BAZANA": "pedro-paulo-bazana",
+    "SECRETÁRIA MARCIA": "marcia-huculak",
+    "SECRETÁRIA MÁRCIA": "marcia-huculak",
+    "DR. ANTENOR": "doutor-antenor",
+    "DOUTOR ANTENOR": "doutor-antenor",
+    "THIAGO BUHRER": "thiago-buehrer",
+    "THIAGO BÜHRER": "thiago-buehrer",
+    "DR. LEÔNIDAS": "dr-leonidas",
+    "DR. LEONIDAS": "dr-leonidas",
+    "MARCEL MICHELETTO": "marcel-micheletto",
+    "DELEGADO TITO BARICHELLO": "tito-barichello"
+};
+
+function getAlepProfileUrl(nome) {
+    // Primeiro, verificar se há um slug fixo verificado
+    const slugFixo = PERFIL_SLUGS_FIXOS[nome.toUpperCase()];
+    if (slugFixo) {
+        return `https://www.assembleia.pr.leg.br/deputados/perfil/${slugFixo}`;
+    }
+    // Fallback: gerar slug automaticamente
+    const nomeFormatado = nome.toLowerCase()
+        .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+        .trim().replace(/\s+/g, '-');
+    return `https://www.assembleia.pr.leg.br/deputados/perfil/${nomeFormatado}`;
+}
+
+// ─── RENDERIZAÇÃO ────────────────────────────────────
+
+let currentSort = 'proposicoes_count';
+let sortDesc = true;
+
+function changeSort(key) {
+    if(currentSort === key) sortDesc = !sortDesc;
+    else { currentSort = key; sortDesc = true; }
+    document.getElementById('sortKey').value = key;
+    renderTable();
+}
+
+function renderTable() {
+    const termo = document.getElementById('mainSearch').value.toLowerCase();
+    const partidoFiltro = document.getElementById('partyFilter').value;
+    const limit = parseInt(document.getElementById('pageSize').value);
+    
+    // Sort Key override from Select
+    const selectorSortKey = document.getElementById('sortKey').value;
+    if(selectorSortKey !== currentSort && document.activeElement === document.getElementById('sortKey')) {
+        currentSort = selectorSortKey;
+        sortDesc = true;
+    }
+
+    // Filtro
+    let finalData = deputadosProcessados.filter(d => {
+        const matchNome = d.nome.toLowerCase().includes(termo);
+        const matchPartido = partidoFiltro === "ALL" || d.partido === partidoFiltro;
+        return matchNome && matchPartido;
+    });
+
+    // Ordenação
+    finalData.sort((a, b) => {
+        let valA = a[currentSort];
+        let valB = b[currentSort];
+        
+        if(typeof valA === 'string') {
+            return sortDesc ? valB.localeCompare(valA) : valA.localeCompare(valB);
+        }
+        return sortDesc ? valB - valA : valA - valB;
+    });
+
+    document.getElementById('tableCount').innerText = `Exibindo ${Math.min(finalData.length, limit)} de ${finalData.length} parlamentares`;
+
+    // Aplica limite
+    let viewData = limit === 999 ? finalData : finalData.slice(0, limit);
+
+    const tbody = document.getElementById('tableBody');
+    tbody.innerHTML = '';
+
+    viewData.forEach(d => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td>
+                <div class="dep-name-cell">
+                    <div>
+                        <div class="dep-name" onclick="openDetails('${d.nome}')">${d.nome}</div>
+                        <div class="dep-party" style="margin-top: 4px; display:inline-block">${d.partido}</div>
+                    </div>
+                </div>
+            </td>
+            <td style="font-weight:600">${d.proposicoes_count}</td>
+            <td>${d.projetos_lei}</td>
+            <td>${d.requerimentos}</td>
+            <td style="color:var(--gold)">${d.mencoes_honrosas}</td>
+            <td style="color:var(--accent2); font-weight:800">${d.leis_count}</td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
+
+function renderCharts() {
+    // 1. Tipos de Proposição Global
+    const tiposMap = {};
+    deputadosProcessados.forEach(d => {
+        d.proposicoes_lista.forEach(p => {
+            tiposMap[p.tipo] = (tiposMap[p.tipo] || 0) + 1;
+        });
+    });
+    const tiposSort = Object.entries(tiposMap).sort((a,b)=>b[1]-a[1]).slice(0, 10);
+
+    const ctxA = document.getElementById('chartTipos').getContext('2d');
+    if(chartA) chartA.destroy();
+    chartA = new Chart(ctxA, {
+        type: 'pie',
+        data: {
+            labels: tiposSort.map(t => t[0]),
+            datasets: [{
+                data: tiposSort.map(t => t[1]),
+                backgroundColor: CORES,
+                borderWidth: 1, borderColor: '#151921'
+            }]
+        },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            layout: { padding: { right: 20 } },
+            plugins: {
+                legend: {
+                    position: 'right',
+                    labels: {
+                        color: '#ffffff',
+                        font: { size: 12, weight: '500' },
+                        padding: 14,
+                        generateLabels: function(chart) {
+                            const data = chart.data;
+                            const total = data.datasets[0].data.reduce((a, b) => a + b, 0);
+                            return data.labels.map((label, i) => {
+                                const value = data.datasets[0].data[i];
+                                const pct = ((value / total) * 100).toFixed(1);
+                                return {
+                                    text: `${label}: ${value} (${pct}%)`,
+                                    fillStyle: data.datasets[0].backgroundColor[i],
+                                    fontColor: '#ffffff',
+                                    strokeStyle: '#151921',
+                                    lineWidth: 1,
+                                    hidden: false,
+                                    index: i
+                                };
+                            });
+                        }
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                            const value = context.parsed;
+                            const pct = ((value / total) * 100).toFixed(1);
+                            return ` ${context.label}: ${value.toLocaleString('pt-BR')} (${pct}%)`;
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    // 2. Produtividade por Partido
+    const partyStats = {};
+    deputadosProcessados.forEach(d => {
+        if(!partyStats[d.partido]) partyStats[d.partido] = { props: 0, leis: 0 };
+        partyStats[d.partido].props += d.proposicoes_count;
+        partyStats[d.partido].leis += d.leis_count;
+    });
+    
+    // Ordena por quantidade total de proposicoes
+    const pData = Object.entries(partyStats).sort((a,b) => b[1].props - a[1].props).slice(0, 15);
+
+    const ctxB = document.getElementById('chartPartidos').getContext('2d');
+    if(chartB) chartB.destroy();
+    chartB = new Chart(ctxB, {
+        type: 'bar',
+        data: {
+            labels: pData.map(p => p[0]),
+            datasets: [
+                {
+                    label: 'Leis Aprovadas',
+                    data: pData.map(p => p[1].leis),
+                    backgroundColor: '#00d4aa',
+                    stack: 'Stack 0'
+                },
+                {
+                    label: 'Proposições',
+                    data: pData.map(p => p[1].props),
+                    backgroundColor: '#6c63ff',
+                    stack: 'Stack 1'
+                }
+            ]
+        },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            interaction: { mode: 'index', intersect: false },
+            scales: {
+                x: { ticks: { color: '#8892a4' }, grid: { display: false } },
+                y: { ticks: { color: '#8892a4' }, grid: { color: '#2a313d' } }
+            },
+            plugins: { 
+                legend: { labels: { color: '#ffffff', font: { weight: '500' } } },
+                tooltip: {
+                    callbacks: {
+                        afterBody: (context) => {
+                            const pName = context[context.length-1].label;
+                            const stats = partyStats[pName];
+                            if(stats && stats.props > 0) {
+                                const pct = ((stats.leis / stats.props) * 100).toFixed(1);
+                                return `Taxa de Conversão: ${pct}%`;
+                            }
+                            return '';
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
+// ─── PAINEL DE DETALHES ──────────────────────────────
+
+function openDetails(nome) {
+    const d = deputadosProcessados.find(x => x.nome === nome);
+    if (!d) return;
+
+    const propsOptions = [
+        'Todas', 
+        'Leis (Aprovadas) - Autoria',
+        'Leis (Aprovadas) - Coautoria',
+        'Projetos de Lei - Autoria',
+        'Projetos de Lei - Coautoria',
+        'Requerimentos - Autoria',
+        'Requerimentos - Coautoria',
+        'Menções Honrosas'
+    ];
+
+    let initialHtml = `
+      <div class="details-header">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+           <div>
+               <h2>${d.nome}</h2>
+               <span class="dep-party">${d.partido}</span>
+           </div>
+           <a href="${getAlepProfileUrl(d.nome)}" target="_blank" class="btn-perfil">🌐 Ver Perfil Oficial ALEP</a>
+        </div>
+        <div style="display:flex; gap:1.5rem; margin-top: 1rem;">
+             <div style="color:var(--muted); font-size:0.85rem;">Proposições: <strong style="color:white">${d.proposicoes_count}</strong></div>
+             <div style="color:var(--muted); font-size:0.85rem;">PLs: <strong style="color:white">${d.projetos_lei}</strong></div>
+             <div style="color:var(--muted); font-size:0.85rem;">Leis: <strong style="color:var(--accent2)">${d.leis_count}</strong></div>
+        </div>
+      </div>
+      
+      <div style="margin-bottom: 20px; display:flex; gap:10px; flex-wrap:wrap;">
+          <select id="propFilterSelect" onchange="updateTemaOptions('${d.nome}')" style="background:var(--bg); border:1px solid var(--border); color:white; padding:8px 12px; border-radius:8px;">
+              ${propsOptions.map(opt => `<option value="${opt}">${opt}</option>`).join('')}
+          </select>
+          <select id="temaSelect" onchange="renderPropsDetail('${d.nome}')" style="display:none; background:var(--bg); border:1px solid var(--border); color:white; padding:8px 12px; border-radius:8px; max-width:250px;">
+              <option value="ALL">Todas as Matérias</option>
+          </select>
+          <input type="text" id="propSearchText" placeholder="Pesquisar ementa ou número..." oninput="renderPropsDetail('${d.nome}')" style="background:var(--bg); border:1px solid var(--border); color:white; padding:8px 12px; border-radius:8px; flex:1; min-width:200px;">
+      </div>
+
+      <div id="propsContainer"></div>
+    `;
+
+    document.getElementById('detailsContent').innerHTML = initialHtml;
+    document.getElementById('detailsPanel').classList.add('open');
+    document.getElementById('overlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
+
+    updateTemaOptions(d.nome);
+}
+
+function updateTemaOptions(nome) {
+    const d = deputadosProcessados.find(x => x.nome === nome);
+    const filter = document.getElementById('propFilterSelect').value;
+    const temaSelect = document.getElementById('temaSelect');
+
+    const showThemeGroups = [
+        'Leis (Aprovadas) - Autoria', 'Leis (Aprovadas) - Coautoria', 
+        'Projetos de Lei - Autoria', 'Projetos de Lei - Coautoria', 
+        'Requerimentos - Autoria', 'Requerimentos - Coautoria'
+    ];
+
+    if (showThemeGroups.includes(filter)) {
+        let baseList = d.proposicoes_lista.filter(p => {
+            const t = p.tipo.toUpperCase();
+            if (filter === 'Leis (Aprovadas) - Autoria') return p.leis && p.leis.length > 0 && !p.is_coautor;
+            if (filter === 'Leis (Aprovadas) - Coautoria') return p.leis && p.leis.length > 0 && p.is_coautor;
+            if (filter === 'Projetos de Lei - Autoria') return t.includes('PROJETO DE LEI') && !p.is_coautor;
+            if (filter === 'Projetos de Lei - Coautoria') return t.includes('PROJETO DE LEI') && p.is_coautor;
+            if (filter === 'Requerimentos - Autoria') return t.includes('REQUERIMENTO') && !p.is_coautor;
+            if (filter === 'Requerimentos - Coautoria') return t.includes('REQUERIMENTO') && p.is_coautor;
+            return true;
+        });
+
+        if (baseList.length > 0) {
+            temaSelect.style.display = 'inline-block';
+            let freqMap = {};
+            baseList.forEach(p => {
+                freqMap[p.temaFormatado] = (freqMap[p.temaFormatado] || 0) + 1;
+            });
+
+            let temas = Object.keys(freqMap).sort();
+            let total = baseList.length;
+
+            let optionsHtml = '<option value="ALL">Todas as Matérias</option>';
+            temas.forEach(t => {
+                let count = freqMap[t];
+                let pct = ((count / total) * 100).toFixed(1);
+                optionsHtml += `<option value="${t}">${t} (${pct}%)</option>`;
+            });
+
+            temaSelect.innerHTML = optionsHtml;
+            temaSelect.value = 'ALL';
+        } else {
+            temaSelect.style.display = 'none';
+        }
+    } else {
+        temaSelect.style.display = 'none';
+        temaSelect.innerHTML = '<option value="ALL">Todas as Matérias</option>';
+    }
+
+    renderPropsDetail(nome);
+}
+
+function renderPropsDetail(nome) {
+    const d = deputadosProcessados.find(x => x.nome === nome);
+    const filter = document.getElementById('propFilterSelect').value;
+    const sText = document.getElementById('propSearchText').value.toLowerCase();
+    const temaSelect = document.getElementById('temaSelect');
+    const tFilter = temaSelect.value;
+    
+    const container = document.getElementById('propsContainer');
+    let html = '';
+
+    let pList = d.proposicoes_lista.filter(p => {
+        const e = (p.ementa || '').toLowerCase();
+        const t = p.tipo.toUpperCase();
+        
+        let passFilter = true;
+        if (filter === 'Leis (Aprovadas) - Autoria') passFilter = p.leis && p.leis.length > 0 && !p.is_coautor;
+        else if (filter === 'Leis (Aprovadas) - Coautoria') passFilter = p.leis && p.leis.length > 0 && p.is_coautor;
+        else if (filter === 'Projetos de Lei - Autoria') passFilter = t.includes('PROJETO DE LEI') && !p.is_coautor;
+        else if (filter === 'Projetos de Lei - Coautoria') passFilter = t.includes('PROJETO DE LEI') && p.is_coautor;
+        else if (filter === 'Requerimentos - Autoria') passFilter = t.includes('REQUERIMENTO') && !p.is_coautor;
+        else if (filter === 'Requerimentos - Coautoria') passFilter = t.includes('REQUERIMENTO') && p.is_coautor;
+        else if (filter === 'Menções Honrosas') passFilter = t.includes('REQUERIMENTO') && (e.includes('menção honrosa') || e.includes('congratulações') || e.includes('louvor') || e.includes('pesar'));
+
+        if (tFilter !== 'ALL' && passFilter) {
+            passFilter = (p.temaFormatado === tFilter);
+        }
+
+        let passSearch = e.includes(sText) || String(p.numero).includes(sText);
+        
+        return passFilter && passSearch;
+    });
+
+    if (pList.length === 0) {
+        container.innerHTML = `<p style="color:var(--muted); text-align:center; padding: 20px;">Nenhuma proposição encontrada para estes filtros.</p>`;
+        return;
+    }
+
+    pList.slice(0, 150).forEach(p => {
+        const isLei = p.leis && p.leis.length > 0;
+        const hlClass = isLei ? 'highlight' : '';
+        const badgeCoautor = p.is_coautor ? `<span style="background:#B01212; color:white; padding:2px 6px; border-radius:4px; font-size:0.65rem; font-weight:bold; margin-left:6px;" title="Parlamentar é Coautor(a)">🤝 COAUTORIA</span>` : ``;
+        
+        let trHtml = '';
+        if(p.tramites && p.tramites.length > 0) {
+            trHtml = `<div class="timeline">`;
+            p.tramites.slice(0, 4).forEach(tr => {
+                const trData = tr.data ? tr.data.split('T')[0] : 'S/D';
+                trHtml += `
+                  <div class="timeline-item">
+                     <div class="t-date">${trData} - ${tr.local}</div>
+                     <div style="color: var(--muted); margin-top:2px;">${tr.acao}</div>
+                  </div>
+                `;
+            });
+            if(p.tramites.length > 4) trHtml += `<div class="timeline-item"><div class="t-date" style="color:var(--muted)">... mais ${p.tramites.length - 4} trâmites</div></div>`;
+            trHtml += `</div>`;
+        }
+
+        html += `
+            <div class="prop-item ${hlClass}">
+                <div class="prop-header">
+                    <div style="display:flex; align-items:center; flex-wrap:wrap; gap:5px;">
+                        <span class="prop-badge">${p.tipo} ${p.numero || ''}/${p.ano || ''}</span>
+                        ${badgeCoautor}
+                        ${p.temaFormatado !== 'OUTROS' ? `<span class="prop-theme">${p.temaFormatado}</span>` : ''}
+                    </div>
+                    <span class="prop-status">${p.status || 'Sem Status'}</span>
+                </div>
+                <div style="font-size:0.75rem; color:var(--accent2); margin-bottom:8px; font-weight:600;">📍 Tramitando em: ${p.localAtual || 'Não informado'}</div>
+                <div class="prop-ementa">${p.ementa}</div>
+                ${isLei ? p.leis.map(l => `
+                    <div style="margin-bottom:10px; font-size:0.85rem; color:var(--accent2); font-weight:bold; background: rgba(0,212,170,0.1); padding: 8px; border-radius: 6px;">
+                        📜 Aprovação de Lei: ${l.desc && l.desc !== 'null' ? l.desc : 'Sem Identificação'}
+                        ${l.data ? `<br><span style="font-size:0.75rem; color:var(--muted); font-weight:normal;">Publicada em: ${l.data.split('T')[0]}</span>` : ''}
+                    </div>
+                `).join('') : ''}
+                ${trHtml}
+                <div style="margin-top: 12px; border-top: 1px solid var(--border); padding-top: 10px; display: flex; justify-content: flex-end;">
+                    <a href="https://www.google.com/search?q=site:assembleia.pr.leg.br+na+integra+&quot;${p.tipo}&quot;+&quot;${p.numero}/${p.ano}&quot;" target="_blank" style="color:var(--accent); text-decoration:none; font-size:0.75rem; font-weight:600; transition:color 0.2s; white-space:nowrap;" title="Busca na íntegra no Diário Oficial e Trâmites da ALEP">
+                       🔍 Pesquisar na Íntegra Oficial (Google) →
+                    </a>
+                </div>
+            </div>
+        `;
+    });
+
+    if (pList.length > 150) {
+        html += `<p style="color:var(--muted); text-align:center; padding: 10px;">Mostrando as primeiras 150 de ${pList.length} proposições. Refine a busca para ver mais específicas.</p>`;
+    }
+
+    container.innerHTML = html;
+}
+
+function closeDetails() {
+    document.getElementById('detailsPanel').classList.remove('open');
+    document.getElementById('overlay').classList.remove('open');
+    document.body.style.overflow = 'auto';
+}
+
+// ─── INITIALIZATION ─────────────────────────────────
+window.onload = () => {
+    prepararDados();
+    populateFilters();
+    updateKPIs();
+    renderTable();
+    renderCharts();
+};
+</script>
+
+</body>
+</html>
+
+
+
+
+

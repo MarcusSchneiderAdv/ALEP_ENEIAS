@@ -1,0 +1,22 @@
+# Node / Frontend / General
+node_modules/
+dist/
+build/
+.DS_Store
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.env
+venv/
+env/
+ENV/
+
+# Data and Logs
+.tmp/
+*.log
+DADOS_ALEP_20.js
+Citações/
+review_temp.txt
