@@ -11,6 +11,13 @@ Este documento estabelece o padrão de conformidade para todas as investigaçõe
 - Respeitar o `robots.txt` onde aplicável, priorizando APIs oficiais.
 - Armazenar o JSON bruto em `.tmp/` para rastreabilidade.
 
-## Auditoria de NLP (IAS)
-- O agente deve citar a fonte (URL ou Arquivo) de cada afirmação.
-- Alertas de "Grave" devem ser verificados por um humano.
+## Auditoria da Investigação Supervisionada (IAS)
+- O agente deve citar a fonte (URL ou arquivo bruto) de cada afirmação.
+- Toda métrica publicada deve ser reconduzível à regra determinística que a produziu.
+- **Vedado ao agente**: classificar, qualificar ou pontuar a atuação de agente público
+  identificado. A camada de adjudicação pertence às rotinas determinísticas em `execution/`
+  (ver `GOVERNANCE.md`).
+- **Vedado ao agente**: suprir dado ausente por inferência. Lacunas são declaradas com sua
+  extensão exata.
+- Achados classificados como graves devem ser verificados por um humano antes de qualquer
+  divulgação.

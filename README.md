@@ -1,344 +1,712 @@
-# Projeto ALEP: Ecossistema Nativo de Extração, Investigação e Aprendizado Supervisionado (E.N.E.I.A.S.)
+# Projeto ALEP: Inteligência Artificial como Meio de Civilidade
 
-Repositório oficial do Projeto ALEP. Este projeto consiste em uma ferramenta tecnológica de código aberto (Open Source) voltada para a estruturação, auditoria e exibição transparente dos dados legislativos da Assembleia Legislativa do Estado do Paraná (ALEP).
+Repositório oficial do Projeto ALEP: uma ferramenta de código aberto para
+estruturação, auditoria e exibição transparente dos dados legislativos da
+Assembleia Legislativa do Estado do Paraná (ALEP), acompanhada da pesquisa
+que a fundamenta.
+
+O trabalho propõe uma **orientação técnica e jurídica** para o emprego de
+Inteligência Artificial em sistemas de controle social. Sua tese central é uma
+regra de alocação: a IA opera legitimamente na camada de **orquestração** de um
+sistema cívico, e é interditada na camada de **adjudicação**, em que fatos são
+imputados a agentes públicos identificados. Essa camada exige processamento
+determinístico, reprodutível e integralmente explicável.
+
+| | |
+|---|---|
+| **Recorte** | 20ª Legislatura da ALEP (2023–2026) |
+| **Fonte** | Serviço público `webservices.assembleia.pr.leg.br/api/public` |
+| **Corpus** | 15.369 proposições · 129.980 eventos de tramitação · 1.677 normas |
+| **Licença** | MIT (ver [LICENSE](LICENSE)) |
 
 ---
 
-## 📖 Monografia e Estudo de Caso
+## Instalar e rodar
 
-Abaixo, encontra-se a monografia completa detalhando os fundamentos jurídicos, teóricos e a arquitetura tecnológica do ecossistema E.N.E.I.A.S.
+O projeto não depende de servidor, banco de dados, credenciais ou chave de
+acesso. O serviço de dados da ALEP é público e irrestrito. É preciso apenas
+Python 3.6 ou superior, e duas bibliotecas.
 
+```bash
+git clone https://github.com/MarcusSchneiderAdv/ALEP_ENEIAS.git
+```
+
+```bash
+cd ALEP_ENEIAS && pip install -r requirements.txt
+```
+
+Feito isso, escolha uma das duas formas de obter os dados. Ambas executam o
+pipeline inteiro sozinhas, sem passo manual.
+
+**Coletar os dados atuais.** Consulta a Assembleia e devolve o estado de hoje.
+O universo será maior que o da pesquisa, porque a legislatura segue em curso.
+
+```bash
+python executar.py
+```
+
+**Usar os dados publicados.** Restaura o universo de 15.369 proposições sobre o
+qual a monografia foi escrita, com integridade conferida por resumo
+criptográfico. É o caminho de quem quer auditar os números publicados.
+
+```bash
+python executar.py --snapshot
+```
+
+Em ambos os casos o programa consulta a Assembleia para obter o estado
+processual de cada proposição, o que exige uma requisição por proposição. Numa
+coleta do zero isso leva cerca de **50 minutos**, com intervalos entre as
+requisições para não sobrecarregar os servidores do Estado. A rotina preserva o
+que já baixou, de modo que pode ser interrompida e retomada sem perda.
+
+### O que você recebe
+
+**Um painel visual.** Abra `index.html` no navegador. Traz a produção por
+parlamentar, distribuição por espécie, conversão em norma e a linha do tempo de
+tramitação de cada proposição.
+
+**Dossiês para consultar com Inteligência Artificial.** Em `dados/perfis/`,
+um arquivo por parlamentar, mais um panorama da Casa e uma planilha consolidada.
+Anexe o arquivo do parlamentar a um assistente de IA e pergunte em linguagem
+natural: quais normas de autoria dele foram sancionadas e sobre o que tratam,
+qual a proporção entre projetos de lei e requerimentos, que assuntos concentram
+seus requerimentos. As instruções de uso e as ressalvas de leitura estão em
+[`dados/perfis/LEIAME.md`](dados/perfis/LEIAME.md).
+
+> Os dossiês descrevem, não qualificam. Não contêm nota, ranking nem juízo de
+> desempenho, e isso é deliberado: a qualificação pertence ao cidadão, não ao
+> sistema que organiza os dados. O capítulo 4 explica por quê.
+
+As matrizes versionadas em `dados/snapshot_2026-03-22/` existem para auditoria do
+que foi publicado, não para uso corrente. Quem quiser trabalhar com dados atuais
+deve rodar a coleta.
+
+---
+
+## RESUMO
+
+A transparência formal não produz transparência material. Na 20ª Legislatura da Assembleia Legislativa do Estado do Paraná (ALEP), 15.369 proposições foram publicadas em formato aberto e legível por máquina sem que disso resultasse qualquer capacidade cidadã de avaliação.
+
+Deste diagnóstico deriva uma regra de alocação de competência algorítmica. Em sistemas que produzem afirmações sobre agentes públicos identificados, a Inteligência Artificial opera legitimamente na camada de **orquestração**, decidindo o que executar, tratando falhas e mantendo a rastreabilidade. Na camada de **adjudicação**, em que fatos são classificados e imputados a pessoas determinadas, é interditada: ali o processamento precisa ser determinístico, reprodutível e explicável.
+
+A IA serve à civilidade quando se recusa a julgar. Devolve ao cidadão a capacidade de avaliar, sem substituir esse juízo por um veredito automatizado. A regra é validada por um artefato funcional cujo código-fonte e resultados são reproduzíveis.
+
+**Palavras-chave:** Inteligência Artificial. Civilidade. Transparência pública. Jurimetria. LGPD. Explicabilidade algorítmica. Civic Tech.
+
+---
 
 ## 1. INTRODUÇÃO
 
-O paradigma do Estado Democrático de Direito consolidou o Princípio da Publicidade (Art. 37, caput, da Constituição Federal de 1988) como pilar inafastável da Administração Pública. Com o advento da Lei de Acesso à Informação (Lei nº 12.527/2011), o ordenamento jurídico brasileiro transitou de uma cultura histórica de sigilo para a presunção de transparência ativa. Os entes estatais, incluindo o Poder Legislativo, passaram a ter o dever normativo de disponibilizar dados referentes às suas atividades finalísticas em portais abertos, franqueando-os ao escrutínio popular. Contudo, a práxis da transparência governamental revelou um paradoxo tecnológico intrínseco à era da informação: a disponibilização massiva e desestruturada de dados brutos não resulta, necessariamente, em controle social efetivo. Na Assembleia Legislativa do Estado do Paraná (ALEP), o volume contínuo de atos, projetos e requerimentos publicados nas plataformas digitais cria uma severa barreira cognitiva para o cidadão comum. Diante desse cenário de opacidade material, a intersecção entre o Direito Público e a Ciência de Dados — especificamente mediante o uso de Inteligência Artificial (IA) e Processamento de Linguagem Natural (NLP) — apresenta-se como o vetor necessário para auditar, classificar e decodificar a produção legislativa, transformando o big data governamental em um instrumento acessível de elucidação eleitoral e governança.
+O Princípio da Publicidade (art. 37, *caput*, da Constituição Federal) é pilar do Estado Democrático de Direito. Com a Lei de Acesso à Informação (Lei nº 12.527/2011), o ordenamento brasileiro transitou de uma cultura de sigilo para a presunção de transparência ativa: os entes estatais, incluído o Legislativo, passaram a ter o dever de disponibilizar dados de suas atividades finalísticas em portais abertos.
 
-### 1.1. O Problema da "Obscuridade por Volume" e a Assimetria Informacional
+Cumprido o dever de publicar, emergiu um paradoxo que a norma não previu. O legislador de 2011 presumiu que a publicação do dado bastaria para viabilizar o controle social, e essa presunção não se confirmou. A ALEP publica integralmente, em formato aberto e estruturado, e ainda assim o cidadão permanece incapaz de responder à pergunta que motiva o voto: *o que meu representante fez?* Publicar deixou de ser sinônimo de tornar acessível.
 
-Desdobrando a premissa inicial, o problema central desta pesquisa manifesta-se na assimetria de informações gerada pela forma como os ritos legislativos são disponibilizados nos portais oficiais. O processo parlamentar estadual abriga proposições de naturezas diametralmente opostas. De um lado, a produção legislativa material, consubstanciada em Projetos de Lei que inovam o ordenamento jurídico e instituem políticas públicas (Art. 24 da Constituição Federal). De outro, a produção legislativa atípica ou simbólica, caracterizada por votos de louvor, concessões de cidadania honorária e declarações de utilidade pública. É sabido que, ao buscar informações sobre a atuação de seus representantes, o eleitor não se depara com dados consolidados ou métricas claras. Pelo contrário, encontra informações dispersas, de difícil entendimento cognitivo e de complexa visualização e acesso. Essa "obscuridade por volume" e a absoluta falta de estruturação arquitetônica dos dados inviabilizam a auditoria cívica, impedindo o cidadão de identificar de forma objetiva se o seu representante atua efetivamente na defesa das pautas estruturais que motivaram o seu voto.
+Este trabalho expõe esse paradoxo pela análise empírica da 20ª Legislatura da ALEP. As 15.369 proposições protocoladas entre 2023 e 2026 são extraídas do serviço público da Casa, reorganizadas por regras verificáveis e devolvidas em forma legível, e o resultado dessa reorganização mede a distância exata entre o que está publicado e o que é compreensível.
 
+É nesse vão que a Inteligência Artificial se apresenta como instrumento de governança. E é nesse mesmo vão que ela se torna perigosa. Um sistema capaz de ler 15.369 proposições e delas extrair um juízo sobre o desempenho de um parlamentar identificado é, ao mesmo tempo, instrumento de emancipação cívica e instrumento de dano reputacional automatizado. A capacidade técnica que traduz o inacessível é a mesma que fabrica a acusação infundada.
 
+Essa ambivalência não é dilema abstrato de ética aplicada. É questão de repartição de competências. A pergunta não é *se* usar IA no controle social, nem *quanta* usar, mas **em qual camada do sistema ela pode operar**, e qual camada o Direito lhe interdita.
 
-### 1.2. Objetivos e Justificativa Acadêmica
+### 1.1. O problema: obscuridade por volume
 
-O objetivo geral desta pesquisa é desenvolver, validar e documentar uma ferramenta tecnológica de código aberto (open source), capaz de categorizar automaticamente a produção legislativa da Assembleia Legislativa do Paraná (ALEP). Em âmbito específico, busca-se: a) extrair os dados legislativos de forma sistemática e íntegra; b) absorver os dados brutos, consumidos em formato JSON diretamente via integração com a API oficial, processando-os estruturalmente para isolar os atos legislativos; e c) apresentar esses dados consolidados em uma interface gráfica imparcial. A justificativa do projeto assenta-se na urgência de fornecer um mecanismo de tecnologia cívica (Civic Tech) que fomente a maturidade política da população, visando assim atuar exclusivamente como um elucidador da política local, mitigando a desinformação por meio da transparência cognitiva e estrutural.
+O processo parlamentar abriga proposições de naturezas distintas. De um lado, a produção que inova o ordenamento e institui políticas públicas. De outro, a produção simbólica ou honorífica, composta por votos de louvor, cidadanias honorárias e declarações de utilidade pública, igualmente legítima, mas de eficácia concreta e restrita.
 
-### 1.3. Delineamento Metodológico (Pesquisa Empírico-Jurídica e Open Source)
+Nos índices oficiais, essas naturezas aparecem indexadas de forma homogênea. Uma lista cronológica não distingue o projeto que reestrutura a política estadual de saúde do requerimento que registra congratulações: ambos ocupam uma linha. O cidadão que consulta o portal não encontra dados falsos. Encontra dados verdadeiros dispostos de modo que impede a formação de juízo. É a **obscuridade por volume**, opacidade produzida não pela ocultação, mas pelo excesso indiferenciado.
 
-Para atingir os escopos propostos, a pesquisa adota uma abordagem empírico-jurídica, de natureza quantitativa e descritiva, ancorada primariamente no dever constitucional de publicidade e no direito fundamental à informação (Art. 5º, XXXIII, e Art. 37, caput, da CF/88). O desenvolvimento da solução tecnológica estrutura-se sob a arquitetura E.N.E.I.A.S. (Ecossistema Nativo de Extração, Investigação e Aprendizado Supervisionado).
-A ingestão de dados ocorre mediante a integração com APIs REST (Representational State Transfer). As APIs REST são interfaces de comunicação em arquiteturas de software que utilizam o protocolo HTTP para permitir a interoperabilidade entre sistemas de forma escalável e sem estado (stateless). Por meio de requisições padronizadas, o sistema consome os dados da ALEP, recebendo cargas úteis (payloads) estritamente em formato JSON (JavaScript Object Notation). Esta abordagem técnica garante alta performance na requisição em massa, estruturação prévia das chaves e valores, e a mitigação de falhas de parsing comumente associadas à extração direta de código HTML (web scraping tradicional).
-A partir dessa coleta, os dados ingressam em um pipeline de processamento. Um pipeline de dados consiste em uma arquitetura de software sequencial focada na automação do fluxo de informações, operando sob o modelo de Extração, Transformação e Carga (ETL). Nesta esteira, os dados brutos transitam por módulos isolados nos quais sofrem higienização de caracteres. Por fim, aplica-se o Processamento Estrutural Determinístico – uma técnica computacional baseada em regras (Rule-Based Data Parsing) que filtra semanticamente os dados orientando-se estritamente pelos metadados oficiais –, garantindo a segmentação temática livre de vieses. Em observância às melhores práticas de Open Science e para garantir a auditoria da transparência algorítmica, o código-fonte integral estará vinculado a esta monografia e disponibilizado publicamente em um repositório no GitHub, permitindo a reprodutibilidade técnica do experimento pela comunidade acadêmica.
-2. TRANSPARÊNCIA PÚBLICA E CONTROLE SOCIAL
-O controle social sobre a Administração Pública constitui um dos pilares de sustentação do Estado Democrático de Direito. Historicamente, o paradigma estatal caracterizava-se pelo sigilo como regra e pela publicidade como exceção, fato que restringia severamente a capacidade do cidadão de fiscalizar o exercício do poder político. Com o advento do constitucionalismo contemporâneo, a informação pública passa a ser concebida não como propriedade do Estado, mas como um bem difuso, titularizado pela coletividade e gerido temporariamente por seus representantes.
-Para que a Administração seja considerada confiável perante a sociedade, a transparência ergue-se como pressuposto inafastável. Conforme leciona o professor Ives Gandra da Silva Martins, os atos estatais exigem clareza absoluta, visto que "exceção feita às questões de segurança nacional, os atos administrativos devem ser transparentes, não se admitindo decisões escusas, resoluções de gaveta, visto que o administrado não pode desconhecer as regras da Administração" (MARTINS, 2006, p. 18). O controle social exige, portanto, que a produção normativa do Poder Legislativo seja submetida ao escrutínio popular contínuo, assegurando a responsabilização dos agentes políticos.
+Esse vácuo não permanece vazio. É preenchido pela curadoria das redes sociais, na qual o próprio parlamentar seleciona os recortes de sua atuação. A assimetria informacional converte-se em assimetria narrativa.
 
-### 2.1. O Princípio da Publicidade e a Lei de Acesso à Informação (LAI)
+### 1.2. Objetivos
 
-No ordenamento jurídico brasileiro, o Princípio da Publicidade encontra-se expressamente consagrado no caput do artigo 37 da Constituição Federal de 1988, impondo-se como condição de validade e controle democrático. A publicidade transcende a mera formalidade de publicação oficial; ela é o vetor que legitima a atuação estatal. Nas palavras do consagrado jurista Celso Lafer:
-“numa democracia a visibilidade e a publicidade do poder são ingredientes básicos, posto que permitem um importante mecanismo de controle ex parte populi da conduta dos governantes. [...] Numa democracia a publicidade é a regra básica do poder e o segredo, a exceção, o que significa que é extremamente limitado o espaço dos segredos de Estado”. (LAFER, 1988, p. 243-244 apud MEDAUAR, 2018, p. 125)
-Contudo, a efetivação fática desse mandamento constitucional sofreu uma profunda mutação com a promulgação da Lei de Acesso à Informação (Lei nº 12.527/2011 - LAI). A referida legislação superou o antigo modelo de "publicidade passiva" e instituiu o dever normativo de "transparência ativa". O artigo 8º da LAI obriga os entes públicos a promoverem, independentemente de requerimentos prévios, a divulgação de informações de interesse coletivo em locais de fácil acesso, in verbis:
+O objetivo geral é formular e validar uma orientação técnica e jurídica para o emprego de IA em auditoria cívica. Especificamente:
 
-Art. 8º É dever dos órgãos e entidades públicas promover, independentemente de requerimentos, a divulgação em local de fácil acesso, no âmbito de suas competências, de informações de interesse coletivo ou geral por eles produzidas ou custodiadas.
-Avançando além da simples disponibilização visual em portais web, a legislação impõe um imperativo tecnológico: o artigo 8º, § 3º, incisos II e III, da Lei de Acesso à Informação, determina que as informações governamentais devem ser oferecidas em formatos estruturados e não proprietários, de forma a possibilitar a leitura por máquina. Consolidando essa exigência normativa, o Decreto nº 8.777/2016, que institui a Política de Dados Abertos do Poder Executivo Federal, estabelece os seguintes princípios e diretrizes basilares:
-Art. 3º A Política de Dados Abertos do Poder Executivo federal será regida pelos seguintes princípios e diretrizes:
-I - observância da publicidade das bases de dados como preceito geral e do sigilo como exceção;
-II - garantia de acesso irrestrito às bases de dados, as quais devem ser legíveis por máquina e estar disponíveis em formato aberto;
-[...]
-IV - permissão irrestrita de reuso das bases de dados publicadas em formato aberto;
-V - completude e interoperabilidade das bases de dados, as quais devem ser disponibilizadas em sua forma primária, com o maior grau de granularidade possível, ou referenciar as bases primárias, quando disponibilizadas de forma agregada;
-[...]
-Cumpre ressaltar que, embora a Política de Dados Abertos positivada pelo Decreto nº 8.777/2016 dirija-se formalmente ao Poder Executivo federal, seus princípios materializam o padrão interpretativo e tecnológico máximo da transparência imposta universalmente pela Lei de Acesso à Informação — diploma que vincula, inafastavelmente, o Poder Legislativo estadual. É sob o influxo desse vetor dogmático que se legitima e orienta a extração automatizada de dados brutos da Assembleia Legislativa do Paraná (ALEP). Ao consumir os dados estruturados (JSON) via integração de API, a ferramenta projeta sobre a esfera legislativa as melhores práticas preconizadas para a vanguarda da Administração Pública, convertendo o dever legal de publicidade em efetiva inteligência cívica.
+**a)** demonstrar, com dados primários, que a transparência formal é insuficiente para produzir controle social sobre o Legislativo estadual;
 
-### 2.2. A Dicotomia: Transparência Formal versus Transparência Material e Cognitiva
+**b)** identificar, na LGPD (Lei nº 13.709/2018) e no Projeto de Lei nº 2.338/2023, os deveres que incidem sobre um sistema automatizado que produz afirmações sobre agentes públicos identificados;
 
-O cumprimento estrito da literalidade da Lei de Acesso à Informação, consubstanciado na mera disponibilização de dados brutos em portais governamentais, não é suficiente para atingir a plenitude constitucional do Princípio da Publicidade. Instala-se, no âmbito do Direito Administrativo contemporâneo, a dicotomia entre a transparência formal (a existência do dado em formato aberto, como um arquivo JSON ou CSV hospedado em um servidor) e a transparência material ou cognitiva (a real capacidade de o cidadão leigo visualizar, compreender e auditar o ato administrativo ou legislativo).
-Ao descarregar um volume massivo de informações desestruturadas sobre o cidadão, o Estado cumpre a etapa burocrática, mas falha na efetivação democrática. A publicidade exige cognoscibilidade. A doutrinadora Odete Medauar, em sua clássica obra Direito Administrativo Moderno, adverte que a transição do sigilo para a publicidade ampla impõe que as atividades da Administração sejam não apenas expostas, mas assimiláveis, visto que "a prevalência do 'secreto' na atividade administrativa mostra-se contrária ao caráter democrático do Estado" (MEDAUAR, 2018, p. 125). A verdadeira transparência, portanto, confere ao cidadão a inteligibilidade necessária para a avaliação crítica. O jurista Ives Gandra da Silva Martins reforça essa premissa ao asseverar que "o administrado não pode desconhecer as regras da Administração", o que pressupõe uma exposição que permita tal conhecimento prático (MARTINS, 2006, p. 18).
-Para ilustrar a urgência dessa materialidade cognitiva, recorre-se ao recente e paradigmático movimento institucional liderado pelo Conselho Nacional de Justiça (CNJ). Historicamente marcado pelo hermetismo vocabular, o Judiciário brasileiro reconheceu que a mera publicação de sentenças e acórdãos nos diários oficiais não efetivava o direito à informação. Em resposta, o CNJ instituiu o "Pacto Nacional do Judiciário pela Linguagem Simples", por meio da Recomendação nº 144/2023. A diretriz determinou que os magistrados adotem linguagem direta e que as decisões e acórdãos sejam acompanhados de resumos em linguagem acessível, visando explicar "o impacto da decisão ou do julgamento na vida de cada pessoa e da sociedade brasileira" (CONSELHO NACIONAL DE JUSTIÇA, 2023, p. 3). O Judiciário admitiu, institucionalmente, que o rigor técnico, quando desprovido de tradução didática, atua como um limitador da cidadania.
-Se no âmbito judicial a barreira é o vocabulário hermético (o "juridiquês"), no Poder Legislativo a barreira é a complexidade algorítmica e a "obscuridade por volume". Entregar uma requisição de API contendo milhares de chaves e valores JSON ao eleitor equivale a entregar um acórdão de centenas de páginas a um leigo: ambos são documentos públicos, mas materialmente opacos. A ferramenta tecnológica proposta nesta pesquisa atua, assim, como o análogo digital do "Pacto pela Linguagem Simples". Ela processa os dados estruturados da ALEP e os converte em painéis visuais cognitivamente acessíveis, rompendo a limitação técnica do cidadão e garantindo a eficácia plena do Artigo 37 da Constituição.
+**c)** derivar desses deveres um critério objetivo de alocação de competência algorítmica;
 
+**d)** implementar esse critério em artefato funcional, auditável e reproduzível; e
 
-### 2.3. A Auditoria Cívica no Estado Democrático de Direito
+**e)** demonstrar que a abstenção de IA na camada de adjudicação não reduz a utilidade cívica do sistema.
 
-O Estado Democrático de Direito não se sustenta exclusivamente pela realização de sufrágios periódicos, mas, precipuamente, pela prerrogativa contínua da sociedade civil fiscalizar a gestão da res publica. Emerge, nesse cenário, o conceito de 'auditoria cívica', instrumento que materializa o controle social extraorgânico e rompe com o monopólio estatal sobre a fiscalização dos próprios atos. Sob a ótica do princípio republicano e da indisponibilidade do interesse público, o escrutínio sobre a Administração configura-se como um imperativo lógico, pautado na premissa de que os mandatários não detêm a propriedade do poder que exercem, atuando unicamente como curadores transitórios de um patrimônio e de interesses que pertencem, em sua totalidade, à coletividade. Sem o controle social, o poder representativo desvirtua-se em absolutismo velado.
-Entretanto, na atual conjuntura digital, o exercício pleno dessa auditoria cívica depara-se com a barreira da complexidade técnica. Conforme superado no tópico anterior, se o Estado fornece a transparência formal por meio de big data, recai sobre a sociedade civil o ônus de desenvolver os mecanismos tecnológicos necessários para alcançar a referida transparência material. É exatamente neste limiar que a engenharia de software e a abertura do código-fonte (open source) assumem uma função garantista.
-Ao demonstrar a auditabilidade do compilador de dados aqui proposto, amarra-se de maneira clara a transparência cognitiva ao controle democrático. A ferramenta tecnológica atua como um tradutor do volume massivo de requisições JSON oriundas da Assembleia Legislativa do Paraná (ALEP). Contudo, ao disponibilizar o pipeline de extração e as regras de processamento estrutural em um repositório público, evita-se que a plataforma se torne uma "caixa-preta" algorítmica.
-A auditabilidade tecnológica assegura a lisura do processo: qualquer cidadão, pesquisador independente ou órgão institucional pode inspecionar o código e certificar-se de que a segregação entre os ritos legislativos ocorre mediante critérios determinísticos e técnicos, isentos de vieses ou manipulação político-partidária. Dessa forma, ao ancorar a transparência cognitiva na auditabilidade irrestrita do seu compilador, o presente projeto garante que a elucidação entregue ao eleitor seja cientificamente neutra, permitindo que a auditoria cívica cumpra sua finalidade constitucional com máxima integridade.
+O Marco Legal da IA tramita no Congresso e as primeiras aplicações de jurimetria política já operam sobre dados brasileiros. Faltam critérios operacionais que traduzam princípios abstratos, como explicabilidade, auditabilidade e não discriminação, em decisões concretas de arquitetura de software. A orientação aqui proposta é um desses critérios.
 
-## 3. O PROCESSO LEGISLATIVO ESTADUAL E A ASSIMETRIA INFORMACIONAL
+### 1.3. Metodologia e recorte
 
-O Poder Legislativo estadual, por sua própria engenharia constitucional, é o epicentro do debate plural e da representação popular. O exercício dessa representação desdobra-se em uma multiplicidade de ritos e procedimentos formais, desenhados para atender a finalidades distintas do mandato — desde a inovação da ordem jurídica até a fiscalização do Executivo e a articulação política regional. A consolidação diária dessa pluralidade de atos em diários oficiais e plataformas digitais governamentais, embora cumpra o requisito formal da publicidade, resulta em um denso acúmulo de dados. Este capítulo dedica-se a dissecar o processo legislativo estadual sob a ótica da ciência de dados e do Direito Público, demonstrando como a diversidade de ritos, quando não categorizada de forma estruturada nas interfaces de consulta, culmina em uma severa assimetria informacional. Ao navegar por repositórios não segmentados, o cidadão perde a capacidade de filtrar a tipologia de sua preferência, dificultando a elucidação sobre o direcionamento temático do mandato de seus representantes.
+A abordagem é empírico-jurídica, quantitativa e descritiva, ancorada no dever constitucional de publicidade e no direito fundamental à informação (art. 5º, XXXIII, e art. 37, *caput*, da CF/88). Articula um movimento dogmático, que reconstrói o regime jurídico aplicável (capítulos 2 a 4), e um empírico, que implementa e testa a orientação daí derivada (capítulos 5 e 6).
 
-### 3.1. Competências e Ritos da Assembleia Legislativa do Estado do Paraná (ALEP)
+**Recorte.** O universo compreende a integralidade das proposições protocoladas na ALEP entre 2023 e 2026, extraídas do serviço público da Casa (`webservices.assembleia.pr.leg.br/api/public`). São **15.369 proposições**, das quais 14.650 têm autoria parlamentar individualizável. As 719 restantes são de iniciativa institucional, oriundas do Poder Executivo, de comissões ou da Mesa, e foram segregadas por não se prestarem à métrica de desempenho individual. Sobre a totalidade do universo foram coletados registros de detalhe, dos quais se extraíram **129.980 eventos de tramitação** e **1.677 vínculos a normas sancionadas**.
 
-De acordo com o texto constitucional (Arts. 24 e 25 da CF/88) e o Regimento Interno da ALEP, a atuação parlamentar materializa-se por meio de um espectro procedimental variado. Nesse contexto, a produção da Assembleia Legislativa ramifica-se em categorias de ritos distintas, todas dotadas de igual legitimidade representativa. Compreendem-se, metodologicamente, três grandes eixos de estruturação:
-a) Proposições Normativas: Atos como Projetos de Lei Ordinária, Projetos de Lei Complementar e Propostas de Emenda à Constituição Estadual, que visam inovar o ordenamento jurídico e regulamentar políticas públicas.
-b) Proposições Fiscalizatórias e Administrativas: Requerimentos, Pedidos de Informação e Indicações, que materializam o poder-dever do Legislativo de auditar os atos do Poder Executivo e solicitar providências de gestão.
-c) Proposições Honoríficas e Simbólicas: Projetos voltados à concessão de títulos de cidadania honorária, votos de louvor, congratulações e declarações de utilidade pública, instrumentos que exercem o legítimo papel de reconhecimento institucional e estreitamento de laços com as bases sociopolíticas regionais.
-A categorização estrutural desses ritos — extraída diretamente dos metadados estruturados no arquivo JSON fornecido pela API da ALEP — não estabelece qualquer hierarquia de importância jurídica ou juízo de valor sobre o mérito das proposições. Trata-se de uma organização taxonômica estritamente descritiva. A ausência de separação por categorias nos índices tradicionais funde todos esses instrumentos, gerando confusão interpretativa. Portanto, o processamento de dados proposto por esta pesquisa atua puramente como um mecanismo de organização temática. A segregação algorítmica garante ao eleitor a capacidade técnica de visualizar a tipologia dos atos de forma isolada e compreensível, respeitando de forma absoluta a validade legal e a pertinência democrática de todas as manifestações que compõem o múnus parlamentar.
+**Dois marcos temporais.** A pesquisa distingue duas datas que respondem a perguntas diferentes, e a distinção é metodologicamente relevante.
 
-### 3.2. A Distinção Dogmática: Esferas de Impacto da Produção Legislativa
+O **fechamento do universo** ocorreu em 22 de março de 2026. É a data que define quais proposições integram o estudo, e a partir dela nenhuma proposição nova foi acrescentada. O objeto é uma legislatura em curso, e o Parlamento seguiu legislando: uma consulta de aferição em agosto de 2026 devolveu 17.239 proposições, contra as 15.369 do corte, sendo a diferença integralmente do exercício de 2026.
 
-A estruturação tecnológica dos ritos parlamentares baseia-se na clássica distinção doutrinária entre "lei em sentido material" e "lei em sentido formal". Essa separação justifica a categorização realizada pelo sistema sem, contudo, atribuir hierarquia de importância entre os atos, uma vez que ambos detêm plena validade jurídica e exercem papéis fundamentais no Estado Democrático de Direito.
-A doutrina constitucionalista leciona que a lei em sentido material caracteriza-se pela generalidade e abstração, inovando o ordenamento jurídico. Enquadram-se nesta categoria os Projetos de Lei que instituem políticas públicas amplas. Em contrapartida, a lei em sentido formal — embora emanada do Poder Legislativo e submetida ao rito constitucional — possui efeitos concretos e restritos, a exemplo das declarações de utilidade pública e concessões de cidadania honorária. Tais instrumentos não impõem obrigações genéricas, mas são essenciais para a articulação política regional e o atendimento das demandas locais.
-Ocorre que, nas plataformas de transparência tradicionais, essa multiplicidade de ritos é indexada de maneira homogênea, ofuscando a natureza da atuação de cada parlamentar. O motor analítico desenvolvido resolve essa assimetria ao segmentar as proposições conforme sua tipologia processual. Essa organização algorítmica permite ao cidadão identificar, de forma clara e visual, o direcionamento e a natureza da produção legislativa de seu representante, substituindo a obscuridade da lista bruta por um panorama estruturado e transparente.
+A **observação do estado processual** ocorreu em 24 de agosto de 2026. Fixado o universo, o percurso de cada proposição dentro dele continua evoluindo, e essa segunda data registra até onde esse percurso foi acompanhado. O evento de tramitação mais recente é de 20 de agosto de 2026 e a norma mais recente é de 27 de julho de 2026.
 
+A separação evita uma confusão comum em estudos legislativos. Um universo congelado com estado processual desatualizado subestima a conversão normativa, porque matérias sancionadas após a coleta aparecem como pendentes. Um universo aberto com estado atualizado impede a reprodução, porque a base muda a cada execução. A combinação adotada, universo fixo e estado observado em data declarada, preserva as duas propriedades.
 
+**Cobertura.** Os registros de detalhe foram obtidos para a totalidade das 15.369 proposições do universo. As matrizes JSON foram congeladas e versionadas no repositório com resumo criptográfico por exercício, e o procedimento de restauração consta do Apêndice A.
 
-### 3.3. A Opacidade da Produtividade Parlamentar e o Viés das Redes Sociais
+---
 
-A avaliação do desempenho dos agentes políticos pelo cidadão perpassa, inevitavelmente, pela análise do Princípio da Eficiência, alçado ao caput do artigo 37 da Constituição Federal pela Emenda Constitucional nº 19/1998. O saudoso administrativista Hely Lopes Meirelles leciona que a eficiência "exige que a atividade administrativa seja exercida com presteza, perfeição e rendimento funcional", impondo ao Estado a busca pelos melhores resultados práticos na gestão dos interesses da coletividade (MEIRELLES, 2016, p. 119). Contudo, a aplicação deste crivo de rendimento funcional ao Poder Legislativo esbarra em um severo obstáculo: a real produtividade dos parlamentares é, na prática, desconhecida pelo público leigo.
-Ao revés do que ocorre na iniciativa privada, não há, nos portais de transparência tradicionais, uma avaliação de produtividade prontamente exibida ou consolidada que traduza o esforço do mandato. Diante desse vácuo informacional e da saturação informacional dos dados brutos, a percepção de eficiência acaba sendo maquiada. Na política contemporânea, essa maquiagem ocorre primordialmente pelo contato direto entre o eleitor e o seu parlamentar por meio das redes sociais. A comunicação digital atua como uma curadoria unilateral: o parlamentar destaca recortes específicos e midiatizados de sua atuação, construindo uma narrativa de alta produtividade que pode não refletir, de fato, a distribuição estrutural e temática de sua produção legislativa global.
-O compilador de dados e o painel analítico (dashboard) desenvolvidos nesta pesquisa rompem com o monopólio dessa narrativa digital. Ao consumir as matrizes JSON e processar estruturalmente as tipologias nativas da ALEP, a ferramenta resgata o dado primário antes que ele sofra a curadoria do marketing político. O sistema transmuta a indexação bruta em um perfil multidimensional, agrupando os dados estritamente por eixos temáticos (Projetos de Lei, Requerimentos, Indicações, etc.). Dessa forma, o projeto devolve ao eleitor a prerrogativa de avaliar a eficiência de seu representante com base na materialidade dos atos praticados — evidenciando os temas que o parlamentar de fato prioriza no exercício do mandato —, neutralizando a desinformação e sobrepondo a transparência cognitiva à retórica das redes sociais.
-4. INTELIGÊNCIA ARTIFICIAL E JURIMETRIA COMO INSTRUMENTOS DE GOVERNANÇA
-A transição do paradigma analógico para o digital no âmbito da Administração Pública trouxe consigo o desafio da governança de dados. Conforme superado nos capítulos anteriores, a simples disponibilização de atos legislativos não garante a elucidação democrática, esbarrando na complexidade e no volume das informações. É neste cenário de assimetria que a Ciência de Dados, aliada ao Direito, deixa de ser uma mera ferramenta de suporte operacional para assumir o protagonismo como um verdadeiro instrumento de governança e controle social. A literatura acadêmica e o avanço da Ciência de Dados reconhecem o impacto massivo da mineração computacional no domínio jurídico, simplificando tarefas de altíssima complexidade analítica. Diante da insuficiência humana para auditar milhares de proposições, a Jurimetria e a Engenharia de Software emergem como a ponte metodológica capaz de converter o Big Data governamental em um painel estruturado, transparente e cognitivamente acessível ao cidadão, sem recorrer a oráculos algorítmicos opacos.
+## 2. TRANSPARÊNCIA PÚBLICA COMO PRESSUPOSTO DE CIVILIDADE
 
-### 4.1. Big Data Jurídico e os Fundamentos da Jurimetria
+O controle social sobre a Administração é um dos pilares do Estado Democrático de Direito, e seu exercício depende de uma condição prévia que a norma brasileira presume satisfeita: a de que o cidadão consiga compreender aquilo que lhe é dado ver. Este capítulo examina essa condição.
 
-Para compreender a aplicação da tecnologia como mecanismo de transparência, é imperativo definir a natureza da matéria-prima com a qual o Estado opera: o Big Data Jurídico. Ao contrário de bases de dados exatas (como registros contábeis ou planilhas financeiras), a produção legislativa e judicial é essencialmente textual, massiva e intrinsecamente complexa.
-O arcabouço informacional do Direito possui propriedades desafiadoras para a computação clássica. A literatura especializada aponta que "os dados jurídicos frequentemente exibem características não estruturadas, como conceitos legais, textos legislativos, julgamentos, comentários jurídicos, etc." (LAI et al., 2023). Devido a essa natureza, a massa de dados textual do legislativo exige técnicas de Data Parsing severamente eficientes para equalizar as divergências. Além da falta de estruturação visual nas plataformas tradicionais, a linguagem utilizada nas ementas exige um rigor técnico irrevogável, visto que o seu teor gera repercussões políticas materiais.
-É para solucionar essa opacidade técnica e semântica que se consolida a disciplina da Jurimetria. Conceituada como a aplicação de métodos estatísticos e computacionais ao Direito, a jurimetria atua na mensuração e na organização do Big Data Jurídico. Contudo, a transformação de textos brutos em estatísticas acessíveis exige cautela no processamento. Para evitar a introdução de vieses matemáticos — comuns em sistemas de linguagem generativa não auditáveis —, este projeto optou intencionalmente por descartar classificadores baseados em Inteligência Artificial probabilística. Em seu lugar, consagrou-se a adoção de um pipeline determinístico. O sistema ancora-se exclusivamente nas taxonomias oficiais retornadas pelas próprias APIs do Estado, consumindo o metadado bruto em formato JSON e transmutando-o, de forma previsível e 100% auditável, em índices de jurimetria política.
-No escopo da presente pesquisa, a jurimetria não é utilizada para prever decisões, mas para classificar e auditar a eficiência legislativa. Ao absorver os dados brutos oriundos da Assembleia Legislativa do Paraná (ALEP), o sistema atua como um tradutor jurimétrico. Ele processa a massa de dados não estruturados e, valendo-se das tipificações presentes nos metadados, isola os ritos processuais (Projetos de Lei, Requerimentos, Homenagens) em categorias temáticas. Dessa forma, a jurimetria cumpre o seu fundamento máximo de governança: domar o Big Data Jurídico, convertendo o volume intangível de textos legais em métricas visuais que devolvem ao eleitor a capacidade de exercer a auditoria cívica de forma plena.
+O paradigma estatal caracterizava-se historicamente pelo sigilo como regra e pela publicidade como exceção, o que restringia a capacidade de fiscalizar o poder. Com o constitucionalismo contemporâneo, a informação pública passa a ser bem difuso, titularizado pela coletividade e gerido transitoriamente por seus representantes. Ives Gandra da Silva Martins fixa a exigência ao afirmar que "exceção feita às questões de segurança nacional, os atos administrativos devem ser transparentes, não se admitindo decisões escusas, resoluções de gaveta, visto que o administrado não pode desconhecer as regras da Administração" (MARTINS, 2006, p. 18).
 
-### 4.2. Transparência Algorítmica e a Mitigação de Vieses de Classificação
+O percurso do capítulo é o seguinte. O item 2.1 reconstrói o regime jurídico da publicidade, do mandamento constitucional ao imperativo tecnológico de dados abertos, e demonstra que a ALEP o cumpre. O item 2.2 mostra por que esse cumprimento não basta, introduz a distinção entre transparência formal e material, e fixa o limite que estrutura todo o restante do trabalho: a ferramenta de auditoria traduz, mas não julga.
 
-A adoção de sistemas computacionais para a categorização de dados governamentais atrai, de imediato, o escrutínio sobre a neutralidade da tecnologia. Subsiste no imaginário social a falácia de que decisões ou classificações tomadas por máquinas são inerentemente imparciais. Contudo, a doutrina especializada em Inteligência Artificial adverte para o fenômeno do viés algorítmico (Algorithmic Bias). Os algoritmos refletem, invariavelmente, as premissas lógicas, as omissões ou os desvios de finalidade dos seus desenvolvedores, podendo gerar resultados discriminatórios ou enviesados caso não sejam submetidos a uma governança estrita.
-No contexto do Big Data legislativo, o risco de viés na classificação de textos jurídicos adquire contornos de responsabilidade civil e política. Se um sistema automatizado classificar erroneamente um Projeto de Lei material e de alto impacto como um mero "Ato Simbólico" ou "Homenagem", ele poderá prejudicar injustificadamente a reputação e a métrica de desempenho de um agente político perante o seu eleitorado. Conforme a literatura que mapeia a intersecção entre o Processamento de Linguagem Natural (NLP) e o Direito alerta, as "deficiências nos algoritmos e as limitações dos conjuntos de dados podem impactar diretamente a sociedade humana, gerando discriminação por inteligência artificial" (SUN et al., 2023).
-Para mitigar esse risco de forma cabal, o Direito prescreve o princípio da explicabilidade ou transparência algorítmica. Não basta que a máquina entregue o resultado; é necessário que o processo lógico que culminou naquele resultado seja perfeitamente rastreável e auditável pelo cidadão e pelas instituições. O jurista e Ministro do Supremo Tribunal Federal, Luís Roberto Barroso, ao discorrer sobre os desafios da revolução digital no Direito, assevera que "deve se investir especialmente em salvaguardas de caráter preventivo, com a adoção de programas de integridade nas gestões pública e empresarial, bem como com a imposição de deveres de imparcialidade, neutralidade e transparência"  (BARROSO, 2019, p. 1294).
-É sob essa exigência ético-jurídica que o presente projeto adota, como pilar inegociável, o licenciamento de código aberto (Open Source). Ao disponibilizar publicamente o pipeline de dados e os algoritmos de extração e transformação (ETL), a ferramenta anula a característica de "caixa-preta" (black box) frequentemente associada aos softwares de classificação. A transparência algorítmica garantida pela arquitetura aberta permite que qualquer inconsistência metodológica seja imediatamente identificada e corrigida pela comunidade ou pelos próprios órgãos de controle. O modelo computacional deixa, assim, de ser um oráculo hermético e passa a operar como um protocolo auditável, garantindo que o agrupamento dos ritos legislativos obedeça a determinismos puramente estruturais e apartidários.
+Convém precisar antes o sentido em que se emprega o termo **civilidade**. Não designa cortesia no debate público nem moderação retórica. Designa a condição material que habilita o cidadão a participar da vida pública em termos informados, isto é, a capacidade efetiva de formar juízo próprio sobre a conduta de quem exerce mandato em seu nome. Nessa acepção, a civilidade é destruída pelo sigilo, pelo excesso indiferenciado e por um sistema automatizado que substitui o juízo do cidadão por um veredito de máquina. As três hipóteses produzem o mesmo resultado: um cidadão que não avalia.
 
+### 2.1. O Princípio da Publicidade e a Lei de Acesso à Informação
 
+O Princípio da Publicidade está consagrado no *caput* do art. 37 da CF/88 como condição de validade e de controle democrático. Transcende a formalidade da publicação oficial, pois é o vetor que legitima a atuação estatal. Nas palavras de Celso Lafer:
 
-### 4.3. Conformidade Regulatória no Tratamento de Dados Governamentais (LGPD e PL 2338/2023)
+> "numa democracia a visibilidade e a publicidade do poder são ingredientes básicos, posto que permitem um importante mecanismo de controle *ex parte populi* da conduta dos governantes. [...] Numa democracia a publicidade é a regra básica do poder e o segredo, a exceção, o que significa que é extremamente limitado o espaço dos segredos de Estado" (LAFER, 1988, p. 243-244 *apud* MEDAUAR, 2018, p. 125).
 
-O tratamento massivo de dados públicos por sistemas computacionais atrai, de forma inexorável, a incidência dos microssistemas de proteção digital brasileiros. Embora as informações coletadas da Assembleia Legislativa do Paraná (ALEP) ostentem caráter institucional e público, a Lei Geral de Proteção de Dados Pessoais (LGPD - Lei nº 13.709/2018) impõe que a publicidade primária do dado não afasta o dever de tratá-lo com adequação, segurança e estrita finalidade (Art. 6º). Sob a ótica da arquitetura desenvolvida (E.N.E.I.A.S.), a conformidade com a LGPD materializa-se pela aplicação prática do Privacy by Design. O pipeline utiliza uma "Governança Efêmera", em que os dados brutos (matrizes JSON extraídas) são alocados temporariamente em um Data Lake transitório (diretório .tmp/). Essa pasta é expurgada e recriada continuamente, mitigando os riscos de armazenamento prolongado de dados colaterais — como nomes de terceiros não públicos citados nas ementas —, assegurando que apenas a estatística essencial seja consolidada.
-Contudo, a governança contemporânea exige ir além da proteção da integridade do dado; ela impõe a regulação do comportamento do próprio algoritmo. É neste cenário de vanguarda jurídica que emerge a imperativa adequação às diretrizes do Projeto de Lei nº 2.338/2023, que institui o Marco Legal da Inteligência Artificial no Brasil. O referido diploma legislativo estabelece que a implementação de sistemas de IA, especialmente aqueles que processam dados do setor público ou impactam agentes sociais, deve ser balizada por princípios inegociáveis de transparência e prestação de contas.
-A necessidade de explicabilidade e auditabilidade consolida-se como um dever jurídico para evitar que classificações automatizadas operem como “caixas-pretas”, gerando vieses que possam macular o desempenho político e a imagem pública dos parlamentares auditados. O avanço do PL 2338/2023 no Congresso Nacional demonstra que o ordenamento jurídico não tolerará sistemas de jurimetria que não consigam justificar a origem de seus resultados, conforme atesta o trâmite legislativo oficial e a ementa da matéria:
-"O texto estabelece fundamentos para o desenvolvimento e uso ético desses sistemas, incluindo a centralidade da pessoa humana e o respeito a valores democráticos. Entre as diretrizes, impõe-se a garantia dos princípios da transparência, da explicabilidade, da inteligibilidade e da auditabilidade, assegurando às pessoas afetadas o direito de compreender e contestar os critérios técnicos das decisões automatizadas." (BRASIL, 2023).
-Ao adotar o licenciamento de código aberto (Open Source) e o processamento estrutural determinístico, a arquitetura proposta nesta pesquisa antecipa-se de forma ativa às exigências do Marco Legal da IA. A abertura do repositório no GitHub garante a auditabilidade técnica exigida pela futura lei, permitindo inspeção cidadã completa. Paralelamente, a lógica de agrupamento temático — baseada estritamente na tipologia legal dos atos, e não em inferências subjetivas — fornece a explicabilidade necessária, atestando que o controle social operado pela ferramenta respeita integralmente o rigor ético, legal e regulatório do Estado brasileiro.
+A Lei de Acesso à Informação superou o modelo de publicidade passiva e instituiu o dever de transparência ativa. Seu art. 8º obriga os entes públicos a divulgar informações de interesse coletivo independentemente de requerimento.
 
-#### **Fluxograma 03: Governança de Dados e Conformidade (LGPD)**
+A legislação impõe ainda um imperativo tecnológico: o art. 8º, § 3º, II e III, determina que as informações sejam oferecidas em formatos abertos, estruturados e legíveis por máquina. O Decreto nº 8.777/2016, que institui a Política de Dados Abertos do Poder Executivo federal, consolida a exigência:
 
+> Art. 3º A Política de Dados Abertos do Poder Executivo federal será regida pelos seguintes princípios e diretrizes:
+> I - observância da publicidade das bases de dados como preceito geral e do sigilo como exceção;
+> II - garantia de acesso irrestrito às bases de dados, as quais devem ser legíveis por máquina e estar disponíveis em formato aberto;
+> [...]
+> V - completude e interoperabilidade das bases de dados, as quais devem ser disponibilizadas em sua forma primária, com o maior grau de granularidade possível [...].
 
-```mermaid
-flowchart LR
-    RawData[/"Dados Brutos da API - JSON Não Tratado"/]
-    
-    subgraph GovEf["Governança Efêmera - Privacy by Design"]
-        DirTMP[("Data Lake Transitório - Pasta .tmp")]
-        Purge["Expurgo Contínuo - Mitigação de Retenção"]
-    end
+Dirigido formalmente ao Executivo federal, o Decreto materializa o padrão tecnológico máximo da transparência que a LAI impõe universalmente, e a LAI vincula o Legislativo estadual. No mesmo sentido orienta a Controladoria-Geral da União ao consolidar que a transparência ativa deve privilegiar formatos que permitam reuso e cruzamento automatizado (BRASIL, 2022).
 
-    subgraph AudTransp["Processamento Determinístico e Auditável"]
-        Regras["Regras Estruturais Fixas - Sem Viés de IA"]
-        Separacao["Separação por Tipologia - Leis, Requerimentos"]
-        OpenSource["Repositório Open Source - Transparência Algorítmica"]
-    end
+A ALEP cumpre esse dever. Disponibiliza serviço público de dados, com respostas em JSON estruturado e sem exigência de credenciamento. O problema examinado não é de ilegalidade, mas de insuficiência, e por isso a solução não pode ser normativa, e sim tecnológica.
 
-    Metric["Painel de Jurimetria Cívica - Sem Nomes de Terceiros / LGPD"]
+### 2.2. Transparência material e o limite do tradutor
 
-    RawData -- "Ingestão" --> DirTMP
-    DirTMP -. "Recriação e Limpeza" .-> Purge
-    DirTMP -- "Consumo para ETL" --> Regras
-    Regras --> Separacao
-    Separacao -- "Código Aberto Auditável" --> OpenSource
-    Separacao -- "Dados Minimizados" --> Metric
-    
-    classDef secure fill:#e1f5fe,stroke:#0288d1,stroke-width:2px;
-    classDef logic fill:#fff3e0,stroke:#f57c00,stroke-width:2px;
-    class DirTMP,Purge,Metric secure;
-    class Regras,Separacao,OpenSource logic;
-```
+A disponibilização de dados brutos não atinge a plenitude do Princípio da Publicidade. Instala-se a dicotomia entre a **transparência formal**, que é a existência do dado em formato aberto, e a **transparência material**, que é a capacidade real de o cidadão leigo visualizar, compreender e auditar o ato. Ao descarregar volume massivo de informação desestruturada, o Estado cumpre a etapa burocrática e falha na efetivação democrática. A publicidade exige cognoscibilidade.
 
+Odete Medauar adverte que "o secreto, invisível, reinante na Administração, mostra-se contrário ao Estado Democrático" (MEDAUAR, 2018, p. 235), lição que alcança toda forma de inacessibilidade material, não apenas o sigilo deliberado.
 
-*Figura 3: Representação visual do fluxo de dados efêmeros sob as diretrizes de privacidade por design.*
+O Judiciário já reconheceu institucionalmente o problema. Historicamente marcado pelo hermetismo vocabular, admitiu que a publicação de sentenças nos diários oficiais não efetivava o direito à informação. Em resposta, o Conselho Nacional de Justiça instituiu o "Pacto Nacional do Judiciário pela Linguagem Simples", pela Recomendação nº 144/2023, determinando que decisões sejam acompanhadas de resumos capazes de explicar "o impacto da decisão ou do julgamento na vida de cada pessoa e da sociedade brasileira" (CONSELHO NACIONAL DE JUSTIÇA, 2023, p. 3).
 
+Se no Judiciário a barreira é o vocabulário hermético, no Legislativo é o volume indiferenciado. Entregar ao eleitor uma resposta de interface com milhares de chaves JSON equivale a entregar um acórdão de centenas de páginas a um leigo: ambos são documentos públicos e ambos são materialmente opacos. A ferramenta proposta é o análogo digital do Pacto pela Linguagem Simples, transposto para o Legislativo estadual.
 
-5. DESENVOLVIMENTO METODOLÓGICO: A ARQUITETURA E.N.E.I.A.S.
-A superação da dissonância de dados no âmbito legislativo exige que a teoria dogmática da transparência seja convertida em uma aplicação tecnológica funcional e auditável. Para concretizar esse imperativo, o desenvolvimento da solução analítica proposta nesta pesquisa foi rigorosamente fundamentado na arquitetura E.N.E.I.A.S. (Ecossistema Nativo de Extração, Investigação e Aprendizado Supervisionado). Sob a ótica da engenharia de software, essa filosofia adota o princípio da Separation of Concerns (Separação de Responsabilidades), dividindo o ecossistema de processamento de dados em três camadas imutáveis e interdependentes: a Diretriz (que estabelece o escopo de negócio e os limites do controle social), a Orquestração (responsável pelo agrupamento lógico e estrutural dos metadados) e a Execução (caracterizada pelo determinismo matemático dos scripts desenvolvidos na linguagem Python). Este capítulo dedica-se a demonstrar, passo a passo, como o big data governamental é extraído, higienizado e transformado em inteligência cívica, comprovando materialmente que o código-fonte obedece aos ditames constitucionais e regulatórios explorados nos capítulos precedentes.
+Daí decorre o limite que estrutura todo o restante do trabalho. A ferramenta de auditoria cívica é **tradutora, não juíza**. Sua legitimidade vem de restituir ao cidadão a informação em forma inteligível, e cessa no instante em que ela própria emite o juízo que caberia ao cidadão formar. Um sistema que informa "o deputado X apresentou 480 proposições, das quais 22% são projetos de lei" cumpre a função de civilidade. Um sistema que informa "o deputado X tem desempenho abaixo da média" a usurpa, pois substituiu o eleitor no ato de avaliar.
 
-### 5.1. Ingestão de Dados via APIs REST e Governança Efêmera
+A distinção não é preciosismo. É a fronteira que o capítulo 4 reconstruirá a partir do ordenamento vigente, e que a arquitetura do capítulo 5 implementa em código.
 
-O primeiro desafio técnico na auditoria de dados governamentais é garantir a integridade da extração. Para contornar a volatilidade estrutural das páginas web tradicionais e mitigar o risco de sobrecarga nos servidores do Estado, o pipeline de ingestão abdicou da raspagem visual de tela (web scraping em HTML) em favor do consumo direto de APIs Públicas baseadas em REST (Representational State Transfer). O tráfego de matrizes tipadas reduz exponencialmente a probabilidade de falhas e garante a coleta íntegra das proposições em formato JSON.
-Contudo, a extração massiva de dados levanta imediatas preocupações atinentes à Lei Geral de Proteção de Dados Pessoais (LGPD). Para garantir a conformidade regulatória logo na primeira etapa do código, a arquitetura E.N.E.I.A.S. implementa o conceito de "Governança Efêmera". O trecho de código abaixo (coletar_proposicoes_api.py) materializa o Privacy by Design:
-Analisando a estrutura do código apresentado, a função requests.get() atua como uma requisição direta ao banco de dados da ALEP, capturando os dados brutos em sua forma original e estruturada. O ponto central dessa rotina de extração, no entanto, reside na declaração do diretório TMP_DIR = "./.tmp/".
-Em vez de armazenar o volume massivo de requisições em um banco de dados relacional permanente, o sistema direciona o despejo de todas as matrizes brutas e inexploradas exclusivamente para esta pasta temporária. O diretório .tmp/ funciona como um Data Lake transitório e efêmero:
-ele é rotineiramente expurgado e recriado pelo orquestrador durante o fluxo de processamento. Sob o aspecto técnico e regulatório, essa arquitetura impede a retenção prolongada de informações secundárias que vêm acopladas ao dado bruto (como nomes de terceiros acidentalmente citados nas ementas originais). Assim, o isolamento na camada efêmera garante que o ecossistema processe estritamente o necessário para a geração das estatísticas finais, materializando algoritmicamente o princípio da minimização dos dados exigido pela LGPD.
+---
 
-### 5.2. Processamento Estrutural e Classificação Temática
+## 3. O OBJETO: A PRODUÇÃO LEGISLATIVA ESTADUAL
 
-Após a ingestão e o isolamento dos dados brutos na camada efêmera, o ecossistema tecnológico avança para a fase de Processamento Estrutural, operando sob o modelo lógico de Extração, Transformação e Carga (ETL). Nesta etapa, as matrizes JSON puras são higienizadas e reestruturadas para corrigir distorções históricas na indexação governamental.
-Um dos principais ruídos identificados na disponibilização dos dados legislativos é a monopolização do mérito processual. Nas listagens tradicionais, sistemas de busca frequentemente associam uma proposição apenas ao seu autor primário (o primeiro signatário), suprimindo a produtividade coletiva do plenário e invisibilizando o esforço dos coautores. Para que o painel de transparência (dashboard) reflita a realidade material do trabalho legislativo com precisão métrica, o orquestrador Python foi programado para aplicar uma lógica de fragmentação iterativa sobre o campo de autoria.
-O bloco de código abaixo ilustra o núcleo dessa transformação algorítmica:
-Analisando a estrutura computacional deste módulo, o algoritmo utiliza a função enumerate() para iterar sobre a lista_obras (um array contendo todos os signatários da proposição). A variável idx atua como um contador numérico de posição. A transformação lógica ocorre na declaração is_coautor_flag = (idx > 0).
-Em termos de engenharia de software, trata-se de uma expressão booleana determinística: se o índice do parlamentar na lista for estritamente igual a zero (idx == 0), a flag de coautoria recebe o valor False, registrando-o como autor primário. Para todos os demais parlamentares cujo índice seja maior que zero (idx > 0), a flag recebe o valor True.
-Ao aplicar essa regra, o laço de repetição (for) distribui cópias estruturadas do mesmo projeto de lei ou requerimento para todos os deputados envolvidos, apensando-as ao DICIONARIO_DEPUTADOS. Essa modelagem de dados resolve o problema de relacionamento de muitos-para-muitos (Many-to-Many Relationships), garantindo que a interface gráfica final consiga renderizar e filtrar estatísticas independentes para cada parlamentar, computando tanto as suas iniciativas isoladas quanto as suas articulações conjuntas. O processamento estrutural assegura, portanto, que a categorização obedeça a critérios matemáticos rígidos, eliminando omissões estatísticas sem a necessidade de intervenção humana.
+Antes de propor qualquer tratamento automatizado, é preciso saber o que exatamente será tratado. Este capítulo delimita o objeto, e a delimitação não é preliminar burocrática: dela dependem tanto a legitimidade da classificação quanto o alcance do que a máquina pode afirmar.
 
-#### **Fluxograma 02: Lógica de Processamento Estrutural (Coautoria)**
+O Legislativo estadual é o epicentro da representação popular, e essa representação desdobra-se em ritos desenhados para finalidades distintas, da inovação da ordem jurídica à fiscalização do Executivo e à articulação regional. A consolidação diária dessa pluralidade em plataformas digitais cumpre o requisito formal da publicidade e produz denso acúmulo de dados indiferenciados.
 
+O capítulo percorre dois movimentos. O item 3.1 examina as espécies proposicionais da ALEP à luz da distinção dogmática entre lei em sentido formal e lei em sentido material, e demonstra que os atos protocolados se distribuem em três grupos de natureza jurídica diversa, um dos quais a distinção clássica sequer contempla. Desse exame resulta a constatação decisiva para a arquitetura: parte dessas fronteiras é registral, isto é, consta do dado oficial, e parte só se alcança por juízo sobre o conteúdo. O item 3.2 trata da consequência prática dessa indiferenciação, que é a impossibilidade de aferir produtividade parlamentar, e do modo como esse vácuo é preenchido pela comunicação política.
+
+### 3.1. Espécies proposicionais e a distinção entre lei formal e material
+
+A autonomia organizativa dos Estados decorre dos arts. 25 e 27 da CF/88, cabendo ao Regimento Interno da ALEP disciplinar as espécies proposicionais e seus ritos.
+
+A estruturação desses ritos apoia-se na distinção entre **lei em sentido material** e **lei em sentido formal**. A distinção exige precisão dogmática, sob pena de erro categorial: não são duas espécies de lei que se excluem, mas **dois critérios independentes**, um relativo ao conteúdo, outro à origem e ao procedimento.
+
+José Afonso da Silva formula ambos. Quanto ao conteúdo:
+
+> "No sentido material, a lei consiste num ato normativo de caráter geral, abstrato e obrigatório, tendo como finalidade o ordenamento da vida coletiva, no sentido de trazer certeza, precisão e garantia às relações jurídicas. [...] **Não importa quem o produza**" (SILVA, 1999, p. 13).
+
+Quanto à forma:
+
+> "Já no sentido formal, lei é o ato jurídico emanado do Poder Legislativo composto de representantes do povo, elaborado e aprovado de acordo com o processo legislativo estabelecido na Constituição, **abstração feita de seu conteúdo**" (SILVA, 1999, p. 13).
+
+O critério material indaga *o que* o ato dispõe; o formal, *de onde* e *como* ele provém. Os dois convergem na maior parte dos casos, e o próprio Silva desfaz a leitura dicotômica corrente: "Quase sempre, no entanto, a lei formal contém as características da lei material, havendo, assim, coincidência entre forma e conteúdo da lei. No entanto, lei em sentido material pode provir do Poder Executivo, como é o caso do decreto-lei" (SILVA, 1999, p. 13).
+
+A distinção só produz consequência prática nas hipóteses de **não coincidência**, e são duas. Há normas materialmente legislativas que não emanam do Parlamento, como decretos, regulamentos e medidas provisórias. E há o inverso, que são atos percorrendo o processo legislativo mas cujo conteúdo não é geral nem abstrato. A doutrina administrativista nomeia essa categoria de **lei de efeito concreto**. Maria Sylvia Zanella Di Pietro a define como lei "apenas, em sentido formal, porque emana do Legislativo e obedece ao processo de elaboração das leis, mas são verdadeiros atos administrativos, quanto ao seu conteúdo" (DI PIETRO, 2009). Ao tratar da declaração de utilidade pública, a autora oferece formulação que se aplica ao objeto aqui examinado: "lei em sentido formal, porque emana do Legislativo; mas ato administrativo em sentido material, porque alcança pessoa determinada" (DI PIETRO, 2009). Odete Medauar registra o mesmo termo técnico ao tratar do cabimento de mandado de segurança contra lei de efeito concreto (MEDAUAR, 2018).
+
+Aplicada ao objeto, a dogmática impõe uma terceira categoria que a distinção clássica não contempla. Os atos protocolados na ALEP distribuem-se em três grupos:
+
+**a) Lei em sentido formal e material.** Projetos de lei que instituem políticas públicas de alcance geral e abstrato. Aqui há a coincidência que, segundo Silva, é a regra.
+
+**b) Lei apenas em sentido formal, ou lei de efeito concreto.** Projetos de lei que declaram utilidade pública ou concedem cidadania honorária. Percorrem o processo legislativo, mas alcançam pessoa determinada, e no conteúdo são atos administrativos. No corpus, 680 proposições de utilidade pública tramitaram como projeto de lei, o que confirma o enquadramento.
+
+**c) Atos que não são lei em sentido algum.** Votos de louvor, congratulações e menções honrosas não constituem lei nem material nem formalmente, porque não percorrem o processo legislativo: são requerimentos, atos de expediente parlamentar. A verificação empírica é inequívoca, pois das proposições que veiculam menção honrosa 3.432 são requerimentos contra 4 projetos de lei, e entre as de congratulações as 3.070 ocorrências são todas requerimentos. Enquadrá-las como "lei em sentido formal" é erro categorial, e é erro que a indexação homogênea dos portais induz.
+
+Nenhum desses grupos é hierarquicamente superior aos demais. Requerimentos cumprem função fiscalizatória e de articulação regional constitucionalmente legítima, e leis de efeito concreto atendem demandas locais que o ordenamento reconhece. A tripartição é descritiva.
+
+Sua relevância para a arquitetura é outra, e é precisa. **A fronteira entre o grupo (c) e os demais é visível no dado oficial**, pois coincide com o campo `tipoProposicao` atribuído pela Casa. Já a fronteira interna entre (a) e (b) **não é registral**: separar o projeto de lei geral e abstrato daquele de efeito concreto exige juízo sobre o conteúdo da ementa. É o tipo de qualificação que a regra do capítulo 4 interdita ao sistema, e que o artefato deixa ao leitor.
+
+### 3.2. A opacidade da produtividade parlamentar
+
+A avaliação de desempenho dos agentes políticos perpassa o Princípio da Eficiência, alçado ao *caput* do art. 37 pela Emenda Constitucional nº 19/1998. Hely Lopes Meirelles leciona que a eficiência "exige que a atividade administrativa seja exercida com presteza, perfeição e rendimento funcional" (MEIRELLES, 2016, p. 119). A aplicação desse crivo ao Legislativo esbarra em obstáculo severo: a produtividade parlamentar é desconhecida pelo público leigo.
+
+Não há, nos portais tradicionais, avaliação consolidada que traduza o esforço do mandato. Diante desse vácuo, a percepção de eficiência é construída alhures, primordialmente nas redes sociais, onde o parlamentar destaca recortes midiatizados de sua atuação e edifica narrativa que pode não refletir a distribuição real de sua produção.
+
+Cabe uma ressalva. **A curadoria não é ilícita nem reprovável**, pois comunicar a própria atuação é parte legítima do mandato representativo. O problema não é o parlamentar selecionar o que divulga, e sim o eleitor não dispor de fonte alternativa contra a qual conferir a seleção. A ferramenta não se opõe à narrativa política, mas garante que exista, ao lado dela, um registro estruturado que o cidadão possa consultar por conta própria.
+
+---
+
+## 4. O REGIME JURÍDICO DA IA APLICADA AO CONTROLE SOCIAL
+
+A ciência de dados aliada ao Direito deixa de ser suporte operacional e assume o papel de instrumento de governança. Assumir esse papel implica assumir um regime jurídico, e é esse regime que este capítulo reconstrói.
+
+A reconstrução importa porque a discussão pública sobre IA no setor público costuma oscilar entre dois extremos igualmente inúteis. De um lado, a proibição genérica, que ignora ganhos reais e não oferece critério. De outro, a permissão fundada em acurácia, que trata um problema jurídico como se fosse estatístico. Nenhuma das posições responde à pergunta que um projetista precisa responder diante de cada componente do sistema: *este aqui pode ser probabilístico?*
+
+O capítulo avança em quatro movimentos. O item 4.1 caracteriza a matéria-prima, o Big Data jurídico, e delimita o emprego da jurimetria a contar e organizar, não a prever. O item 4.2 expõe o risco do processamento, que é o viés algorítmico, e o dever de explicabilidade que o ordenamento lhe opõe, demonstrando que explicabilidade plena exige regra enunciável e não apenas código publicado. O item 4.3 identifica os dispositivos incidentes na LGPD e no Marco Legal da IA em formação, com destaque para o direito de contestação. Desses três movimentos o item 4.4 deriva a regra de alocação de competência algorítmica, que é a contribuição normativa do trabalho e o critério que organiza toda a arquitetura do capítulo seguinte.
+
+### 4.1. Big Data jurídico e jurimetria
+
+Ao contrário de bases exatas, como registros contábeis, a produção legislativa é textual, massiva e complexa. A literatura aponta que "os dados jurídicos frequentemente exibem características não estruturadas, como conceitos legais, textos legislativos, julgamentos, comentários jurídicos, etc." (LAI *et al.*, 2023). A massa textual do Legislativo exige técnicas de *parsing* rigorosas para equalizar divergências de forma, e a linguagem das ementas exige rigor técnico porque seu teor gera repercussões políticas materiais.
+
+A **jurimetria**, aplicação de métodos estatísticos e computacionais ao Direito, atua na mensuração e organização desse acervo. Seu emprego aqui é delimitado: não se destina a **prever** decisões, mas a **contar e organizar** fatos registrais consumados. A distinção é jurídica, não apenas técnica. A predição projeta sobre o sujeito comportamento futuro que ele ainda não praticou, ao passo que a contagem reorganiza o que ele já praticou e o Estado já publicou. A primeira demanda justificação, e a segunda é exercício de leitura.
+
+### 4.2. Viés algorítmico e o dever de explicabilidade
+
+Subsiste no imaginário social a falácia de que classificações feitas por máquinas são imparciais. A doutrina adverte para o **viés algorítmico**: os algoritmos refletem as premissas, omissões e desvios de finalidade de seus desenvolvedores, e podem gerar resultados discriminatórios sem governança estrita.
+
+No Big Data legislativo, o risco adquire contornos de responsabilidade civil e política. Um sistema que classifique erroneamente um projeto de lei de alto impacto como "ato simbólico" prejudica a reputação e a métrica de desempenho de um agente político. O dano é assimétrico e de difícil reparação, pois a retificação técnica raramente alcança o público que a classificação equivocada atingiu. A literatura que mapeia a intersecção entre modelos de linguagem e Direito registra que a opacidade dos sistemas contemporâneos e as limitações de seus conjuntos de dados obstam sua aplicação em domínios que exigem justificação (LAI *et al.*, 2023).
+
+Contra esse risco o Direito prescreve a **explicabilidade**. Não basta que a máquina entregue o resultado, pois o processo lógico que a ele conduziu precisa ser rastreável e auditável. Luís Roberto Barroso assevera que "deve se investir especialmente em salvaguardas de caráter preventivo, com a adoção de programas de integridade nas gestões pública e empresarial, bem como com a imposição de deveres de imparcialidade, neutralidade e transparência" (BARROSO, 2019, p. 1294).
+
+A exigência tem consequência técnica que costuma passar despercebida. Explicabilidade não se satisfaz com a divulgação do código de um modelo probabilístico: um classificador estatístico pode ter seus pesos publicados e permanecer inexplicável, porque a razão de uma classificação individual não é recuperável a partir deles. Explicabilidade plena exige responder, para **cada** resultado, *por que este caso recebeu esta classificação*, e responder com uma regra, não com uma correlação.
+
+### 4.3. LGPD e o Marco Legal da IA
+
+Embora as informações coletadas da ALEP tenham caráter institucional e público, a LGPD impõe que a publicidade primária do dado não afasta o dever de tratá-lo com adequação, segurança e estrita finalidade (art. 6º). Dois dispositivos incidem diretamente sobre o objeto.
+
+O **art. 20** assegura ao titular o direito de solicitar revisão de decisões tomadas unicamente com base em tratamento automatizado que afetem seus interesses, inclusive as destinadas a definir seu perfil profissional. Um sistema que atribuísse automaticamente qualificação de desempenho a um parlamentar identificado incidiria nessa hipótese.
+
+O **art. 7º, § 3º** estabelece que o tratamento de dados tornados manifestamente públicos não dispensa a observância dos princípios legais e dos direitos do titular. É a base normativa da afirmação central deste capítulo: **o dado ser público não torna livre o que se faz com ele**.
+
+Quanto à regulação do próprio algoritmo, o **Projeto de Lei nº 2.338/2023** institui o Marco Legal da Inteligência Artificial. Aprovado por unanimidade no Plenário do Senado em 10 de dezembro de 2024, tramita na Câmara com expectativa de deliberação final em 2026. Não é proposição incipiente, mas diploma que já obteve consenso em uma das Casas, circunstância que confere às suas diretrizes força de vetor interpretativo antes mesmo da vigência. Na esteira do modelo europeu, estrutura-se pela classificação por níveis de risco e assegura aos afetados direitos de transparência, explicação e contestação:
+
+> "O texto estabelece fundamentos para o desenvolvimento e uso ético desses sistemas, incluindo a centralidade da pessoa humana e o respeito a valores democráticos. Entre as diretrizes, impõe-se a garantia dos princípios da transparência, da explicabilidade, da inteligibilidade e da auditabilidade, assegurando às pessoas afetadas o direito de compreender e contestar os critérios técnicos das decisões automatizadas" (BRASIL, 2023).
+
+O elemento decisivo é o **direito de contestar**. Contestar pressupõe conhecer o critério, e conhecer o critério pressupõe que exista critério enunciável. Um sistema cuja classificação decorre de correlações distribuídas por milhões de parâmetros não oferece objeto contestável, e sim um resultado que se pode lamentar. A garantia de contestabilidade não é obrigação acessória de documentação: é restrição de projeto que determina quais técnicas são admissíveis em cada função do sistema.
+
+### 4.4. A regra de alocação de competência algorítmica
+
+> **Regra de alocação.** Em um sistema automatizado de auditoria cívica, o processamento probabilístico é admissível nas camadas cujos erros são *recuperáveis pelo próprio sistema e invisíveis ao sujeito auditado*, e é interditado nas camadas cujos erros *se convertem em afirmação pública sobre pessoa determinada*.
+
+O critério não pergunta se a técnica é sofisticada, nem se é acurada. Pergunta **quem suporta o erro**. Quando um componente erra e o sistema detecta, corrige e repete a operação, o erro é interno e nenhum direito de terceiro foi tocado. Quando um componente erra e o resultado sai impresso ao lado do nome de um parlamentar, o erro tornou-se imputação.
+
+A regra reparte o sistema em três camadas:
+
+**Diretriz (o quê).** Define escopo, limites legais e critérios de auditoria. Competência estritamente humana, pois nenhuma finalidade de tratamento pode ser fixada pelo próprio sistema, sob pena de esvaziamento do princípio da finalidade (LGPD, art. 6º, I).
+
+**Orquestração (quem e quando).** Decide qual rotina executar, em que ordem, como reagir a falhas de rede, quando uma extração está completa, como diagnosticar mudança na estrutura de uma interface de dados. **Aqui a IA opera com ganho real.** Um erro de orquestração, como invocar a rotina errada ou interpretar mal um código de retorno, é detectável, reversível e não produz afirmação sobre pessoa alguma. É erro de meio.
+
+**Adjudicação (o quê é verdade sobre quem).** Determina que uma proposição pertence a determinado parlamentar, que possui determinada natureza, que se converteu ou não em norma. **Aqui a IA é interditada.** O erro é afirmação falsa sobre pessoa identificada, publicada e indexada, isto é, erro de resultado. O direito de contestação exige que essa camada opere por regras enunciáveis, verificáveis linha a linha e reproduzíveis por terceiros.
+
+Duas consequências. A primeira é que a regra não é antitecnológica, pois não recomenda menos automação, e sim automação alocada: o sistema do capítulo 5 é integralmente automatizado, e a IA nele desempenha função verificável. A segunda é que a regra é falseável, porque se a abstenção de IA na camada de adjudicação empobrecesse o resultado cívico, estaria refutada na prática, ainda que correta em tese. O capítulo 6 apresenta os dados que permitem julgar o ponto.
+
+É assim que a Inteligência Artificial se converte em meio de civilidade: não por decidir melhor que o cidadão, mas por operar a máquina que devolve ao cidadão as condições de decidir.
+
+---
+
+## 5. A ARQUITETURA E.N.E.I.A.S.
+
+A regra do capítulo anterior seria inútil se não fosse implementável. Este capítulo demonstra sua implementação, e a demonstração vale menos pelo que o sistema faz do que pelo que ele se recusa a fazer.
+
+A arquitetura chama-se **E.N.E.I.A.S.**, Ecossistema Nativo de Extração, Investigação e Aprendizado Supervisionado. A última expressão exige precisão terminológica, pois "aprendizado supervisionado" não designa aqui a técnica estatística homônima. Designa o regime de operação da camada de orquestração, em que o agente de IA atua sob supervisão humana permanente e sob diretrizes escritas que não pode alterar unilateralmente. Nenhum modelo é treinado e nenhuma inferência estatística produz resultado exibido ao cidadão, de modo que a supervisão é jurídica e processual, não estatística.
+
+Sob a ótica da engenharia de software, a arquitetura adota o princípio da *Separation of Concerns*, repartindo o ecossistema nas três camadas que a regra prescreve. Os itens seguintes percorrem cada uma delas: o 5.1 trata da diretriz, competência humana indelegável que fixa a finalidade antes de qualquer coleta; o 5.2 trata da orquestração, único domínio em que a IA opera, e relata um episódio de auditoria que demonstra tanto seu valor quanto sua contenção; e o 5.3 trata da execução determinística, que é a camada de adjudicação, detalhando a ingestão, a distribuição de coautoria, a classificação por chave oficial e a entrega ao cidadão.
+
+### 5.1. Camada 1, Diretriz
+
+Documentos versionados em Markdown (`directives/`) definem objetivos, limites legais, parâmetros técnicos e regras de negócio de cada rotina. São procedimentos operacionais padrão legíveis por humanos e por agentes.
+
+Sua função jurídica é fixar a **finalidade** do tratamento antes que qualquer dado seja tocado (LGPD, art. 6º, I). A fixação é indelegável: o agente lê a diretriz e a ela se vincula, mas não a redige nem a altera. Um sistema que pudesse redefinir a própria finalidade tornaria o princípio inoperante, pois qualquer tratamento seria retroativamente legitimado pela finalidade que ele mesmo se atribuísse.
+
+### 5.2. Camada 2, Orquestração
+
+A segunda camada é ocupada pelo agente de IA. Suas atribuições são de meio: roteamento entre rotinas, ordem de execução, tratamento de erros de rede, diagnóstico de alterações no contrato das interfaces de dados e proposição de correções ao código da camada de execução. É aqui que se realiza o **auto-reparo** da arquitetura, pois quando uma interface altera seu contrato, o agente identifica a mudança, ajusta o script, testa e documenta a alteração na diretriz.
+
+A auditoria técnica desta pesquisa produziu o caso que demonstra a camada em operação, e vale relatá-lo por inteiro.
+
+A rotina de consolidação lia os campos aninhados de tramitação e de normas legais empregando nomes de chave que não correspondiam ao contrato do serviço: buscava `dataPublicacaoOrdemDia`, `orgao` e `descricao` onde o serviço entrega `data`, `local` e `acoes[].descricao`; e buscava `numeroLei`, `anoLei` e `dataPublicacao` onde o serviço entrega `numero`, `ano` e `data`. O efeito era silencioso: a totalidade dos eventos de tramitação era baixada dos servidores do Estado e descartada na leitura, e todos os vínculos normativos eram degradados a um rótulo genérico, sem número de lei nem data.
+
+A rotina de coleta de normas apresentava a mesma classe de defeito no sentido inverso, da requisição para o servidor. O filtro de exercício era enviado sob a chave `anoLei`, e o serviço reconhece `ano`. O comportamento é instrutivo, pois **o serviço não rejeita o parâmetro desconhecido**. Ignora o filtro, varre a base normativa integral, operação que consome cerca de dois minutos e excede o tempo-limite configurado, e devolve todos os exercícios misturados. O sintoma observável era erro de rede, mas a causa era um nome de campo.
+
+Em ambos os casos o sistema reportava sucesso. Nenhuma exceção era lançada, nenhum código de saída sinalizava anomalia.
+
+O episódio sustenta três pontos. Primeiro, é o tipo de erro que a camada de orquestração existe para capturar, e cuja detecção exige leitura conjunta de contrato, código e dados, trabalho para o qual a IA é adequada. Segundo, **um erro de meio permaneceu erro de meio**: enquanto vigorou, produziu ausência de informação, jamais informação falsa sobre um parlamentar. A arquitetura degradou-se para menos, não para errado, ao passo que um sistema que inferisse probabilisticamente os trâmites ausentes teria convertido falha de leitura em afirmação incorreta publicada ao lado de um nome próprio. Terceiro, e mais relevante para a orientação proposta, por reportarem sucesso ambos os defeitos justificam a vedação que a diretriz da Camada 2 impõe ao tratamento genérico de exceção que absorve o erro sem registro. Um sistema de auditoria cívica que não audita a si mesmo não tem autoridade epistêmica para auditar terceiros.
+
+### 5.3. Camada 3, Execução
+
+Rotinas determinísticas em Python (`execution/`) realizam extração, transformação e consolidação. É a camada de adjudicação, e nela o processamento probabilístico é interditado.
+
+Sua propriedade definidora é o determinismo: a partir dos mesmos dados de origem, produz sempre o mesmo resultado, sem estado oculto, sem amostragem e sem parâmetros ajustados por treino. Essa propriedade é o que torna o sistema **contestável** nos termos do art. 20 da LGPD e do PL nº 2.338/2023, pois qualquer cidadão pode tomar uma linha do resultado, localizar a regra que a produziu e verificá-la contra o dado de origem.
+
+#### 5.3.1. Ingestão e governança efêmera
+
+Para contornar a volatilidade das páginas web e mitigar o risco de sobrecarga nos servidores do Estado, o pipeline abdicou da raspagem visual de tela em favor do consumo direto de interfaces públicas de dados. O tráfego de matrizes tipadas reduz falhas de *parsing* e garante coleta íntegra em JSON.
+
+Os dados brutos são alocados em diretório transitório (`.tmp/`), que funciona como repositório efêmero, isolado do repositório publicado por regra de exclusão versionada. O isolamento assegura que informações secundárias acopladas ao dado bruto não ingressem no artefato distribuído.
+
+#### 5.3.2. Distribuição do mérito de coautoria
+
+Um dos principais ruídos da indexação legislativa é a **monopolização do mérito processual**, pois sistemas de busca associam a proposição apenas ao primeiro signatário e suprimem a produtividade coletiva.
+
+O serviço da ALEP entrega a autoria como cadeia de texto delimitada por vírgulas, no formato `"DEPUTADA MARIA VICTORIA, DEPUTADO EVANDRO ARAUJO"`. O orquestrador segmenta a cadeia, higieniza cada segmento removendo prefixos de tratamento e normalizando espaços e caixa, e percorre a lista resultante com índice. A posição zero é o autor primário e toda posição superior é coautoria. A regra é uma expressão booleana determinística, `is_coautor = (indice > 0)`, que distribui cópias estruturadas da proposição a todos os signatários, resolvendo um relacionamento de muitos-para-muitos.
+
+A consequência metodológica precisa ser lida corretamente. Como cada proposição em coautoria é contabilizada uma vez para **cada** signatário, a soma das contagens individuais (22.128) excede o número de proposições distintas (14.650), com fator de expansão de 1,51. Não é inflação artificial, mas decisão explícita de atribuir mérito a quem subscreveu, cuja transparência é condição de legitimidade.
 
 ```mermaid
 flowchart TD
-    Input[/"Matriz JSON de Proposição - Lista de Autores"/]
+    Input[/"Campo autor da API - cadeia delimitada por virgulas"/]
+    Split["Fragmentacao por delimitador e higienizacao de nomes"]
+    Filtro{"Autor e entidade institucional?"}
+    Fora["Segregado da metrica individual - Executivo, comissoes, Mesa"]
+    Iteracao{"Para cada parlamentar, por indice"}
+    Check{"Indice igual a zero?"}
+    AutorPrincipal["Registrar como autor primario - flag falsa"]
+    Coautor["Registrar como coautor - flag verdadeira"]
+    Dicionario[/"Consolidado por deputado - metricas atualizadas"/]
 
-    Iteracao{"Para cada parlamentar na lista"}
-    Check{"O Índice é igual a zero?"}
-    AutorPrincipal["Registrar como Autor Principal - Flag False"]
-    Coautor["Registrar como Coautor - Flag True"]
-    Dicionario[/"DICIONARIO_DEPUTADOS - Métricas Atualizadas"/]
-
-    Input --> Iteracao
+    Input --> Split --> Filtro
+    Filtro -- "Sim" --> Fora
+    Filtro -- "Nao" --> Iteracao
     Iteracao --> Check
     Check -- "Sim" --> AutorPrincipal
-    Check -- "Não - Índice maior que zero" --> Coautor
+    Check -- "Nao - indice maior que zero" --> Coautor
     AutorPrincipal --> Dicionario
     Coautor --> Dicionario
 
     classDef process fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px;
-    class Iteracao,Check process;
+    class Iteracao,Check,Filtro process;
 ```
 
+*Figura 1: Fragmentação da autoria e distribuição determinística do mérito de coautoria.*
 
-*Figura 2: Diagrama de decisão sobre a fragmentação e distribuição de mérito de coautoria.*
+#### 5.3.3. Classificação por chave oficial
 
+A categorização usa exclusivamente o campo `tipoProposicao`, atribuído pela Casa no ato do protocolo. O sistema **não interpreta a ementa**, não infere tema a partir do texto e não deriva natureza por semelhança semântica.
 
+O custo dessa restrição precisa ser declarado. Um classificador textual produziria agrupamentos mais ricos que os oito rótulos oficiais, e poderia separar, dentro dos 11.229 requerimentos, os de fiscalização e os de homenagem. É também o que permitiria distinguir, entre os projetos de lei, os de alcance geral daqueles de efeito concreto, na fronteira que o item 3.1 identificou como não registral. Optou-se por não fazê-lo, porque tal separação seria afirmação do sistema, não da Casa, e recairia sobre parlamentares identificados. A informação que o sistema deixa de oferecer é o preço da informação que ele pode garantir.
 
-### 5.3. Arquitetura de Visualização e Integração Open Source
+#### 5.3.4. Entrega
 
-A última fase da arquitetura E.N.E.I.A.S. consiste na entrega do dado processado ao cidadão de forma acessível, rápida e economicamente viável. Em projetos tradicionais de tecnologia governamental, a exibição de matrizes complexas de dados exige a manutenção de infraestruturas onerosas, como clusters de bancos de dados relacionais (ex: PostgreSQL) operando em tempo real no lado do servidor para responder às consultas (queries) dos usuários. Essa exigência de hardware frequentemente inviabiliza a sustentabilidade de iniciativas independentes de Civic Tech.
-Para contornar essa barreira de infraestrutura e democratizar o acesso à ferramenta, a solução desenvolvida adota a abordagem de Static Payload (Carga Útil Estática). Ao final da etapa de processamento estrutural abordada no tópico anterior, o algoritmo de agrupamento serializa o "mega-dicionário" gerado em Python, convertendo-o em uma estrutura de dados estática que é injetada diretamente no ecossistema Web (no arquivo dashboard.html).
-Essa arquitetura suprime totalmente a necessidade de um Backend Database complexo operando do lado do cliente. O processamento pesado de cruzamento e contagem de leis é terceirizado para o orquestrador Python durante o "fluxo de montagem" (antes da publicação). Quando o eleitor acessa o painel, o navegador apenas renderiza o resultado matemático já consolidado, garantindo extrema velocidade de navegação, alta portabilidade e custo de manutenção de servidores virtualmente nulo.
+Concluída a consolidação, o dicionário é serializado em carga útil estática (`DADOS_ALEP_20.js`), consumida diretamente pelo navegador. A arquitetura dispensa banco de dados em operação no servidor, pois o processamento de cruzamento e contagem ocorre uma vez, na montagem, e o navegador renderiza resultado consolidado.
 
-#### 5.3.1. Orquestração e Sequência de Execução do Pipeline
+O ganho é de sustentabilidade econômica, requisito prático para a perenidade de iniciativas independentes de *Civic Tech*. A dimensão real deve ser declarada: a carga útil ocupa cerca de 24 MB, reduzidos a 2,6 MB sob compressão em trânsito. É volume compatível com hospedagem estática gratuita, mas não desprezível, e cresce com a legislatura. O custo de servidor é nulo, mas o de transferência não é.
 
-A validade acadêmica e cívica de um software de código aberto (Open Source) reside na sua capacidade de ser auditado e executado por terceiros. Para assegurar a reprodutibilidade integral desta pesquisa pelos órgãos de controle ou por qualquer cidadão, o ecossistema foi projetado para operar mediante uma sequência lógica, linear e determinística.
-O fluxo de montagem (build pipeline) que converte o big data bruto da ALEP no painel visual cognitivo obedece à seguinte ordem de orquestração:
-Fase de Ingestão e Isolamento (coletar_proposicoes_api.py): o operador inicia o sistema executando o script primário. Neste momento, o algoritmo cria a estrutura de governança efêmera (a pasta .tmp/), dispara as requisições HTTP via API REST para os servidores da Assembleia Legislativa e descarrega as matrizes JSON contendo os dados brutos de todas as proposições da legislatura.
-Fase de Enriquecimento e Mineração Paralela: em seguida, são acionados os gatilhos secundários (como o módulo coletar_detalhes_api.py e as requisições de coleta de normas). Neste momento crucial, o sistema invoca pools de paralelismo ("ThreadPoolExecutor") e processamento assíncrono para mergulhar nos detalhes históricos de milhares de proposições, capturando trâmites complexos, eventuais normas já convertidas e as coautorias, operando com absoluta velocidade perante as respostas REST da Casa Legislativa.
-Fase de Classificação e Agrupamento (agrupar_dados_dashboard.py): Com os dados validados, executa-se o núcleo analítico (ETL). Este script consome os dados da pasta temporária, higieniza as strings, aplica a fragmentação de autoria/coautoria (distribuindo o mérito coletivo) e categoriza as proposições nos seus respectivos eixos temáticos (Projetos de Lei, Requerimentos, Homenagens), gerando o Static Payload.
-Fase de Serviço e Interface Gráfica: Por fim, o arquivo estático final (dashboard.html) é gerado e fica pronto para ser consumido em qualquer navegador moderno. A interface lê a carga útil estruturada e renderiza os gráficos e as tabelas de ordenação, entregando ao usuário final a transparência material e cognitiva almejada.
-Para tangibilizar a abstração técnica deste fluxo de orquestração, o ciclo de vida da aplicação consolida-se por meio de um diagrama de blocos funcionais. A representação visual mapeia a trajetória estrita do dado governamental, evidenciando a separação de responsabilidades (Separation of Concerns) entre os módulos. A Figura 1 ilustra a arquitetura E.N.E.I.A.S. em sua totalidade, demonstrando o percurso linear desde a extração na fonte primária (API), passando pelo isolamento na camada efêmera, até a transformação estrutural que culmina na entrega da carga útil estática na interface do usuário.
-
-#### **Fluxograma 01: Arquitetura Geral E.N.E.I.A.S.**
-
+A carga útil incorpora ainda os metadados da própria extração, com data de compilação, período coberto, evento mais recente e volumes consolidados. O painel os exibe ao leitor sem intervenção manual, de modo que quem executa o pipeline vê a procedência dos dados que está olhando.
 
 ```mermaid
 flowchart TD
-    ALEP[("API REST ALEP - Fonte")]
+    ALEP[("Servico publico de dados da ALEP")]
 
-    subgraph Fase1_2["Fase 1 e 2: Ingestão e Governança Efêmera"]
+    subgraph C1["Camada 1 - Diretriz (humana)"]
+        Dir["directives/ - finalidade, limites legais, parametros"]
+    end
+
+    subgraph C2["Camada 2 - Orquestracao (IA supervisionada)"]
+        Agente["Agente: roteamento, tratamento de falhas, auto-reparo"]
+    end
+
+    subgraph C3["Camada 3 - Execucao (deterministica)"]
         Script1["coletar_proposicoes_api.py"]
-        TMP[/"Diretório Temporário - Data Lake Efêmero"/]
-    end
-
-    subgraph Fase3["Fase 3: Enriquecimento Assíncrono"]
         Script2["coletar_detalhes_api.py"]
-        Threads["Pool de Paralelismo - ThreadPoolExecutor"]
+        Script3["coletar_normas_api.py"]
+        TMP[/"Diretorio efemero - dados brutos isolados"/]
+        ETL["agrupar_dados_dashboard.py - fragmentacao e classificacao"]
+        Payload["Static Payload - carga util consolidada"]
     end
 
-    subgraph Fase4["Fase 4: Processamento Estrutural - ETL"]
-        Script3["agrupar_dados_dashboard.py"]
-        ETL_Steps["Higienização de Strings, Fragmentação e Categorização"]
-        Payload["Static Payload - Dicionário Consolidado"]
-    end
+    Cidadao(("Cidadao - juizo proprio"))
 
-    subgraph Fase5["Fase 5: Interface Gráfica - Dashboard"]
-        HTML["dashboard.html"]
-        Browser["Navegador do Eleitor - Renderização Estática"]
-    end
+    Dir -- "vincula" --> Agente
+    Agente -- "invoca, nunca simula" --> Script1
+    Agente --> Script2
+    Agente --> Script3
+    Script1 -- "requisicao HTTP" --> ALEP
+    Script2 --> ALEP
+    Script3 --> ALEP
+    ALEP -- "JSON bruto" --> TMP
+    TMP -- "leitura por regra fixa" --> ETL
+    ETL -- "serializacao" --> Payload
+    Payload -- "renderizacao estatica" --> Cidadao
 
-    ALEP -- "Requisição HTTP via JSON" --> Script1
-    Script1 -- "Despejo de Matrizes Brutas - Privacy by Design" --> TMP
-    TMP --> Script2
-    Script2 -- "Consultas Paralelas de Trâmites" --> Threads
-    Threads -- "Dados Enriquecidos" --> Script3
-    Script3 --> ETL_Steps
-    ETL_Steps -- "Serialização" --> Payload
-    Payload -- "Injeção de Dados Estáticos" --> HTML
-    HTML -- "Transparência Cognitiva" --> Browser
-
-    classDef script fill:#f9f,stroke:#333,stroke-width:2px;
-    classDef storage fill:#ff9,stroke:#333,stroke-width:2px;
-    class TMP,Payload storage;
-    class Script1,Script2,Script3 script;
+    classDef humano fill:#e1f5fe,stroke:#0288d1,stroke-width:2px;
+    classDef ia fill:#fff3e0,stroke:#f57c00,stroke-width:2px;
+    classDef det fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px;
+    class Dir,Cidadao humano;
+    class Agente ia;
+    class Script1,Script2,Script3,ETL,TMP,Payload det;
 ```
 
+*Figura 2: Arquitetura E.N.E.I.A.S. e a repartição de competência algorítmica entre as três camadas.*
 
-*Figura 1: Visão geral da arquitetura E.N.E.I.A.S. e fluxo de dados do backend ao front-end.*
+---
 
+## 6. RESULTADOS
 
+Os capítulos anteriores afirmaram que a transparência formal não produz transparência material e que a abstenção de IA na adjudicação não empobrece o resultado cívico. Este capítulo submete ambas as afirmações aos dados.
 
-As instruções técnicas pormenorizadas para a execução de cada um destes comandos em terminais de desenvolvimento constam no arquivo README.md do repositório oficial do projeto no GitHub, cujo mapeamento estrutural encontra-se detalhado no Apêndice A desta monografia.
+O que se apresenta não é uma avaliação de parlamentares, e sim a medida da distância entre o que a ALEP publica e o que dessa publicação se consegue extrair. Os itens 6.1 a 6.3 expõem a composição real da produção legislativa, sua eficácia normativa e o regime de autoria, todos obtidos sem qualquer inferência sobre pessoas identificadas. O item 6.4 quantifica o que a correção da camada de execução recuperou, e o 6.5 avalia a orientação e declara a limitação remanescente.
 
+Todas as tabelas são reproduzíveis pela sequência do Apêndice A. Números do universo bruto incluem proposições de iniciativa institucional, e os demais referem-se às 14.650 de autoria parlamentar individualizável.
 
+### 6.1. A composição real da produção legislativa
 
-## 6. APRESENTAÇÃO E DISCUSSÃO DOS RESULTADOS
+**Tabela 1: Proposições por espécie (universo bruto: 15.369)**
 
-A validação de uma ferramenta de tecnologia cívica (Civic Tech) transcende a mera verificação de sua estabilidade computacional; ela exige a comprovação do seu impacto na esfera democrática e na elucidação política. Após a implementação da arquitetura E.N.E.I.A.S. e a extração dos dados estruturados da Assembleia Legislativa do Paraná (ALEP), os resultados obtidos revelam uma transformação substancial na forma como a produção legislativa pode ser consumida pela sociedade civil. Este capítulo destina-se a apresentar os reflexos práticos do painel de transparência (dashboard), discutindo como a reestruturação da matriz de dados rompe com a opacidade institucional e devolve ao cidadão a capacidade de auditar, de maneira crítica e fundamentada, o desempenho de seus representantes eleitos.
+| Espécie proposicional | Quantidade | Participação |
+|---|---:|---:|
+| Requerimento | 11.229 | 73,1% |
+| Projeto de Lei | 3.399 | 22,1% |
+| Emenda de Plenário | 573 | 3,7% |
+| Projeto de Resolução | 65 | 0,4% |
+| Projeto de Lei Complementar | 46 | 0,3% |
+| Projeto de Decreto Legislativo | 36 | 0,2% |
+| Proposta de Emenda à Constituição | 12 | 0,1% |
+| Veto | 9 | 0,1% |
 
-### 6.1. O Impacto do Filtro Algorítmico na Avaliação de Desempenho
+Quase três quartos da produção protocolada são requerimentos. Projetos de lei representam pouco mais de um quinto, e proposta de emenda constitucional aparece doze vezes em quatro anos.
 
-Conforme delineado nos capítulos teóricos, o principal obstáculo ao controle social na política contemporânea não é a ausência absoluta de dados, mas o vácuo informacional gerado pela sua desestruturação, o qual acaba sendo preenchido e enviesado pelo marketing político nas redes sociais. Ao aplicar o filtro algorítmico sobre as requisições JSON extraídas da ALEP, o sistema desenvolvido não apenas organiza a informação, mas altera profundamente a cognição do usuário sobre a métrica de desempenho parlamentar.
-O impacto primário da ferramenta reside na desconstrução da "ilusão de ótica" representativa. Antes da aplicação do processamento estrutural (ETL), a indexação oficial apresentava os ritos legislativos de maneira linear e indistinta. Essa apresentação impedia o leigo de quantificar e qualificar o foco do mandato. Com a implantação do dashboard, o filtro algorítmico atua como um decodificador temático. Ao isolar estritamente por taxonomia legal nativa, o painel amplia o leque de observações possíveis, permitindo ao eleitor visualizar graficamente as diversas frentes de alocação de esforço do parlamentar.
-Os resultados práticos demonstram que, ao acessar a interface, o eleitor adquire a competência técnica para identificar imediatamente o perfil de atuação de um deputado. Torna-se visível, por exemplo, se um representante dedica a maior parte do seu mandato à formulação de macropolíticas públicas de impacto estadual, ou se a sua atuação é predominantemente voltada à articulação regional por meio de indicações e concessões de títulos.
-Ressalta-se que o impacto do filtro não se confunde com o papel de um julgador algorítmico. A fragmentação dos dados em eixos temáticos atinge a transparência material sem emitir qualquer juízo de valor sobre a legitimidade dos atos. O software não qualifica um parlamentar como mais ou menos eficiente com base no tipo de proposição que ele prioriza, visto que tanto as inovações normativas quanto as homenagens compõem a pluralidade essencial do Estado Democrático de Direito. A grande entrega do projeto, portanto, é a neutralização da retórica digital: a avaliação de desempenho deixa de ser pautada pelo recorte unilateral das redes sociais e passa a ser ancorada na auditoria cívica imparcial e rastreável.
+O dado não autoriza juízo de mérito, e o sistema não o emite. O que autoriza é a constatação de que **a imagem pública do trabalho legislativo, construída em torno da figura do projeto de lei, não corresponde à distribuição real do esforço protocolado**, constatação até aqui inacessível ao cidadão.
 
-### 6.2. A Ferramenta como Indutora de Maturidade Política e Elucidação Cidadã
+Dos 3.399 projetos de lei, 587 (17,3%) são de iniciativa institucional, majoritariamente do Executivo. A discriminação da origem, invisível nos índices tradicionais, revela que parte substantiva da agenda normativa estadual não se origina do Parlamento.
 
-A implementação de tecnologias cívicas (Civic Techs) transcende a automação de processos administrativos; ela atua como um vetor pedagógico no tecido social. Ao converter o complexo Big Data governamental em uma interface analítica acessível, a ferramenta desenvolvida exerce um papel fundamental na elucidação do cidadão. Conforme demonstrado, a verdadeira transparência não reside apenas na disponibilidade do dado bruto, mas na capacidade cognitiva do receptor em compreendê-lo.
-Nesta esteira, o painel interativo (dashboard) estabelece um novo padrão para o controle social extraorgânico. Ao fragmentar e mapear a atuação legislativa — distinguindo claramente o que é inovação do ordenamento jurídico (Projetos de Lei e Normas Legais) daquelas ações voltadas à articulação regional stricto sensu (Requerimentos, Indicações e Votos de Louvor) —, o cidadão é empoderado com a métrica real do mandato de seus representantes. Rompe-se, dessa forma, a dependência nociva dos recortes otimizados por algoritmos de marketing político nas redes sociais, que muitas vezes distorcem a percepção pública ao invisibilizar algumas etapas do processo legislativo.
-Isso induz, invariavelmente, ao amadurecimento político. O eleitor deixa a condição de mero espectador passivo de uma narrativa unilateral para assumir a postura de auditor cívico. Munido de dados segmentados de maneira imparcial e determinística, o cidadão torna-se capaz de correlacionar as promessas de campanha com a produção material fática do parlamentar, elevar a qualidade do debate público e realizar um escrutínio representativo muito mais técnico, consciente e qualificado nas esferas democráticas do Estado.
+### 6.2. A distância entre protocolar e legislar
 
-## 7. CONCLUSÃO
+**Tabela 2: Conversão em norma legal, por espécie (autoria parlamentar)**
 
-O presente projeto acadêmico e tecnológico propôs-se a enfrentar uma das maiores disfunções práticas do Estado Democrático de Direito na era digital: a dicotomia entre a publicidade formal imposta pela norma e a barreira da opacidade cognitiva. A premissa inicial de que a obscuridade por volume inviabilizava o controle social sobre o Poder Legislativo estadual comprovou-se fática ao se analisar o imenso acervo de matrizes JSON não consolidadas que os cidadãos precisarão interpretar isoladamente caso não contem com interfaces intermédias.
-A pesquisa entregou, portanto, não apenas uma tese jurídica de aplicabilidade do Princípio da Publicidade, mas a materialidade de um ecossistema de software operável: a arquitetura E.N.E.I.A.S. Atrelada intrinsecamente aos mandamentos de Privacy by Design (Governança Efêmera via diretórios estritamente de trânsito) estabelecidos pela Lei Geral de Proteção de Dados (LGPD) e à preocupação com vieses algorítmicos levantada pelo Marco Legal da IA (PL 2338/2023), a solução adotou uma postura conservadora e segura. Ao dispensar o uso de redes neurais subjetivas na interpretação textual, a arquitetura assegurou 100% de transparência e determinismo, classificando as proposições exclusivamente através de filtragem semântica estruturada pelas chaves oficiais da Assembleia Legislativa do Estado do Paraná (ALEP).
-A conversão final desse complexo arranjo tecnológico na entrega de um Static Payload (arquivos JSON pré-digeridos injetados em um aplicativo Front-End interativo sem dependência de banco de dados nativo) materializa a sustentabilidade econômica e a vocação perene das Civic Techs. O painel analítico gerado atende plenamente aos objetivos traçados, fragmentando e evidenciando a pluralidade de atuações inerentes ao mandato legislativo, sem emitir valor de mérito.
-Conclui-se, destarte, que o emprego estratégico da Engenharia de Software e da Jurimetria atua como a infraestrutura garantista do princípio republicano e da publicidade prevista no caput do Art. 37 da Constituição Federal. Com isso, ergue-se não apenas como código, mas como a sublime manifestação do 'Pacto pela Linguagem Simples' transposto do Judiciário diretamente para as entranhas digitais do Poder Legislativo estadual. Ao transmutar dados densos em informação acessível, a ferramenta desmancha oligopólios narrativos da era das redes sociais e devolve o escrutínio orgânico e fidedigno a quem, por direito originário, pertence todo o poder: o cidadão brasileiro.
-8. REFERÊNCIAS
+| Espécie | Proposições | Normas resultantes | Taxa |
+|---|---:|---:|---:|
+| Projeto de Decreto Legislativo | 5 | 2 | 40,0% |
+| Projeto de Lei | 2.812 | 1.043 | 37,1% |
+| Proposta de Emenda à Constituição | 7 | 2 | 28,6% |
+| Projeto de Resolução | 16 | 3 | 18,8% |
+| Projeto de Lei Complementar | 9 | 1 | 11,1% |
+| Requerimento | 11.228 | 0 | 0,0% |
+| Emenda de Plenário | 573 | 0 | 0,0% |
 
-BANDEIRA DE MELLO, Celso Antônio. **Curso de Direito Administrativo**. 32. ed. São Paulo: Malheiros, 2015. Disponível em: https://www.tce.sp.gov.br/epcp/cadernos/index.php/CM/article/download/302/214/. Acesso em: 5 abr. 2026.
+**Tabela 3: Situação processual (autoria parlamentar)**
 
-BARROSO, Luís Roberto. Revolução tecnológica, crise da democracia e mudança climática: limites do Direito num mundo em transformação. **Revista Estudos Institucionais**, Rio de Janeiro, v. 5, n. 3, p. 1262-1313, set./dez. 2019. DOI: 10.21783/rei.v5i3.429. Acesso em: 5 abr. 2026.
+| Situação | Quantidade | Participação |
+|---|---:|---:|
+| Arquivada | 10.988 | 75,0% |
+| Tramitando | 3.662 | 25,0% |
+
+Três quartos das proposições estão arquivadas. Entre os projetos de lei, pouco mais de um terço converte-se em norma sancionada. Os números medem o **funil legislativo**, isto é, a distância entre iniciativa e resultado normativo, que a comunicação política raramente expõe, já que o protocolo é evento noticiável e o arquivamento não é.
+
+O limite interpretativo precisa ser explicitado: taxa de conversão **não é** medida de qualidade parlamentar. Proposições são arquivadas por perda de objeto, absorção por matéria correlata, opção de mérito da Casa e fim de legislatura. O sistema oferece o número e se abstém de qualificá-lo, pois qualificá-lo cabe ao cidadão, ao jornalista e ao pesquisador.
+
+### 6.3. A produtividade coletiva tornada visível
+
+**Tabela 4: Regime de autoria (universo bruto: 15.369)**
+
+| Regime | Proposições | Participação |
+|---|---:|---:|
+| Autoria individual | 13.874 | 90,3% |
+| Coautoria | 1.495 | 9,7% |
+
+Quando há coautoria, a média é de **6,0 signatários**, com máximo de **57**, número próximo da composição total da Casa, o que indica matérias de consenso suprapartidário.
+
+Este resultado mede o ganho do processamento estrutural. Sob indexação por autor primário, 1.495 proposições seriam atribuídas a um único parlamentar cada, e cerca de 7.500 subscrições de coautoria permaneceriam invisíveis. A fragmentação recupera **22.128 vínculos autor-proposição** onde a indexação tradicional exibiria 14.650.
+
+### 6.4. Recuperação do histórico processual
+
+A auditoria da camada de execução, relatada no item 5.2, incidiu sobre o mapeamento incorreto de chaves. Sua correção produziu, sobre o mesmo universo de proposições e sem nova requisição aos servidores do Estado, o seguinte resultado.
+
+**Tabela 5: Efeito da correção da camada de execução**
+
+| Métrica | Antes | Depois |
+|---|---:|---:|
+| Vínculos autor-proposição | 22.128 | 22.128 |
+| Vínculos com linha do tempo processual | 0 | 21.360 |
+| Eventos de tramitação disponíveis | 0 | 129.980 |
+| Normas com identificação genérica | 1.592 | 0 |
+| Normas com número, data e situação oficial | 0 | 1.677 |
+
+Onde o sistema exibia `"Norma vinculada ao PROJETO DE LEI 710/2023"`, sem data, passou a exibir `"Lei 21964/2024, 30/04/2024, Sancionada, Código Estadual da Pessoa com Transtorno do Espectro Autista"`, com os eventos que registram o percurso entre protocolo e sanção.
+
+O resultado importa além do reparo técnico. A informação que faltava ao cidadão **já estava publicada** pela ALEP e, no caso do mapeamento de chaves, já havia sido transferida ao pipeline e descartada na leitura. A opacidade não decorria de omissão do Estado, mas de falha na camada de tradução, o que confirma a tese do capítulo 2: cumprida a transparência formal, a material depende da qualidade do intermediário.
+
+### 6.5. Avaliação da orientação e limitação declarada
+
+A regra do item 4.4 foi formulada como proposição falseável, de modo que se a abstenção de IA na camada de adjudicação empobrecesse o resultado cívico, estaria refutada na prática.
+
+Os dados não a refutam. Sem inferência probabilística sobre parlamentares identificados, o sistema produz a composição da produção por espécie, a taxa de conversão normativa, a situação processual, o regime de autoria com mérito distribuído e o histórico de tramitação de 21.360 vínculos. Nenhuma dessas informações exigiu classificador estatístico, e todas são verificáveis contra a fonte oficial. O custo da abstenção está declarado no item 5.3.3, que é a ausência de subcategorização temática, e não compromete nenhuma das perguntas que motivam a auditoria cívica.
+
+**Limitação declarada.** A carga útil publicada preserva a ementa das proposições em redação original. Ementas de requerimentos honoríficos contêm nomes de pessoas naturais alheias ao mandato, como homenageados, autoridades locais e familiares. Embora constituam ato público publicado pela Casa, o art. 7º, § 3º, da LGPD determina que essa condição não dispensa os princípios da finalidade e da minimização. A finalidade declarada do sistema é auditar a atuação parlamentar, e para ela o nome do homenageado é dado colateral. A conformidade plena recomenda suprimir ou mascarar esses antropônimos na carga distribuída, preservando a ementa integral apenas na camada efêmera. A medida não foi implementada e constitui a principal recomendação de continuidade.
+
+Registre-se que essa limitação é de **minimização**, não de **alocação**. A regra do capítulo 4 está integralmente implementada, pois nenhuma afirmação sobre parlamentar identificado decorre de inferência. O que permanece pendente é a vedação (e) do item 7.2, relativa à entrega, e o fato de o próprio checklist ter identificado a falha é evidência de que ele opera.
+
+---
+
+## 7. ORIENTAÇÃO CONSOLIDADA
+
+Os capítulos precedentes formularam uma regra, implementaram-na e mediram seu resultado. Resta convertê-la em instrumento de trabalho, e é isso que este capítulo faz.
+
+O destinatário é quem projeta, contrata, audita ou regula sistemas automatizados de auditoria cívica. Para esse leitor, princípios como explicabilidade e não discriminação são inúteis enquanto permanecerem abstratos, pois não indicam o que fazer diante de um componente concreto. A orientação abaixo traduz a regra do item 4.4 em decisões verificáveis, e foi extraída da experiência de construir o artefato, não deduzida em gabinete: cada vedação corresponde a uma escolha que o projeto precisou fazer, e algumas correspondem a erros que ele cometeu antes de corrigir.
+
+A orientação organiza-se em dois blocos. O item 7.1 apresenta o teste de alocação, três perguntas que determinam se um componente admite processamento probabilístico. O item 7.2 lista as vedações que se aplicam independentemente da técnica empregada, e delimita o alcance da orientação, indicando os domínios para os quais ela se transpõe e aqueles que exigem exame próprio.
+
+### 7.1. O teste de alocação
+
+Diante de qualquer componente, três perguntas determinam se ele admite processamento probabilístico.
+
+**O erro deste componente produz afirmação sobre pessoa identificada?** Se sim, o componente é de adjudicação e a inferência probabilística está interditada. Se o erro produz apenas ausência, atraso ou reprocessamento, é componente de meio.
+
+**É possível enunciar, para cada resultado individual, a regra que o produziu?** Se a resposta exigir referência a pesos, correlações ou similaridade estatística, não há critério contestável na acepção do art. 20 da LGPD e do PL nº 2.338/2023.
+
+**Um terceiro, de posse do código e dos dados de origem, reproduz o resultado exatamente?** Reprodutibilidade é o que converte a promessa de auditabilidade em fato verificável. Sem ela, publicar o código é gesto simbólico.
+
+Componente que falhe em qualquer das três deve ser realocado para a orquestração ou substituído por regra determinística.
+
+### 7.2. Vedações e alcance
+
+As vedações aplicam-se a qualquer sistema de auditoria cívica, independentemente da técnica empregada.
+
+**a)** Atribuir automaticamente qualificação, nota, ranking ou juízo de desempenho a agente público identificado. A métrica pode ser exibida, mas qualificá-la pertence ao cidadão.
+
+**b)** Inferir a natureza, o tema ou a relevância de um ato a partir de seu texto, quando o resultado for imputado a pessoa determinada e existir campo oficial que cumpra a mesma função.
+
+**c)** Preencher lacuna de coleta por estimativa, interpolação ou modelo preditivo. A lacuna é medida, declarada com sua extensão e, sempre que possível, eliminada por nova coleta.
+
+**d)** Publicar resultado cuja regra de formação não possa ser exibida ao sujeito auditado em linguagem compreensível.
+
+**e)** Tratar a publicidade primária do dado como autorização irrestrita de tratamento, redistribuição ou retenção de informação colateral.
+
+**f)** Absorver falha de coleta em tratamento genérico de exceção, pois erro silenciado converte falha detectável em lacuna invisível.
+
+Quanto ao alcance, a orientação foi validada em auditoria de produção legislativa estadual. Sua transposição para domínios de estrutura análoga, como execução orçamentária e contratações públicas, é plausível por compartilharem a característica determinante de produzir afirmações sobre agentes públicos identificados a partir de registros oficiais estruturados, mas nenhum desses domínios foi testado aqui e a transposição permanece hipótese a verificar.
+
+Domínios em que o objeto da auditoria seja o cidadão, e não o agente público, exigem exame próprio e não estão abrangidos. A assimetria é relevante, pois o agente público submete-se a escrutínio ampliado em razão do múnus que exerce, ao passo que o particular conserva expectativa de privacidade que esta pesquisa não examinou.
+
+---
+
+## 8. CONCLUSÃO
+
+A premissa inicial confirmou-se. A ALEP cumpre integralmente seu dever legal de transparência ativa, publica em formato aberto e estruturado, e ainda assim as 15.369 proposições da 20ª Legislatura permaneciam materialmente inacessíveis ao cidadão comum.
+
+A resposta não foi apenas a ferramenta que supera essa inacessibilidade, mas a regra que orienta sua construção. A legitimidade do emprego de IA em sistemas cívicos não se decide pela sofisticação da técnica nem por sua acurácia agregada, e sim pela pergunta sobre quem suporta o erro. Onde o erro é absorvido pelo próprio sistema, a IA opera com ganho verificável, e neste projeto operou, no diagnóstico de falhas e no auto-reparo da camada de execução. Onde o erro se converte em afirmação pública sobre pessoa identificada, cede lugar ao determinismo, porque o direito de contestação assegurado pelo art. 20 da LGPD e pelo PL nº 2.338/2023 pressupõe um critério enunciável, e correlação estatística distribuída por parâmetros não é critério enunciável.
+
+Os resultados demonstram que a abstenção não empobreceu o produto cívico. Sem qualquer inferência sobre parlamentares identificados, o sistema tornou visível que 73,1% da produção protocolada são requerimentos, que 37,1% dos projetos de lei de autoria parlamentar convertem-se em norma, que 75,0% das proposições estão arquivadas e que 1.495 proposições em coautoria, antes creditadas a um único signatário, envolveram seis parlamentares em média. Recuperou 129.980 eventos de tramitação que a Casa já havia publicado e que se perdiam na camada de tradução.
+
+Esse último achado sintetiza a lição. A informação que faltava ao cidadão não estava sonegada, pois estava publicada, transferida e descartada por um erro de leitura silencioso. A transparência material depende da qualidade e da honestidade do intermediário, e é por isso que o intermediário precisa ser auditável.
+
+A IA como meio de civilidade não é a IA que decide melhor que o cidadão. É a IA que opera a máquina que devolve ao cidadão as condições de decidir, e que reconhece o ponto exato em que deve parar. Ao transmutar dados densos em informação acessível sem transmutá-los em veredito, a ferramenta desfaz oligopólios narrativos sem instituir um novo.
+
+---
+
+## 9. REFERÊNCIAS
+
+BARROSO, Luís Roberto. Revolução tecnológica, crise da democracia e mudança climática: limites do Direito num mundo em transformação. **Revista Estudos Institucionais**, Rio de Janeiro, v. 5, n. 3, p. 1262-1313, set./dez. 2019. DOI: 10.21783/rei.v5i3.429. Disponível em: https://estudosinstitucionais.com/REI/article/view/429. Acesso em: 5 abr. 2026.
 
 BRASIL. **Constituição da República Federativa do Brasil de 1988**. Brasília, DF: Presidência da República, 1988. Disponível em: http://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm. Acesso em: 5 abr. 2026.
 
-BRASIL. Controladoria-Geral da União (CGU). **Guia de Aplicação da Lei de Acesso à Informação**. 3. ed. Brasília: CGU, 2022. Disponível em: https://repositorio.cgu.gov.br/bitstream/1/29957/15/aplicacao_lai_3a_ed.pdf. Acesso em: 5 abr. 2026.
+BRASIL. Controladoria-Geral da União. **Guia de Aplicação da Lei de Acesso à Informação**. 3. ed. Brasília: CGU, 2022. Disponível em: https://repositorio.cgu.gov.br/bitstream/1/29957/15/aplicacao_lai_3a_ed.pdf. Acesso em: 5 abr. 2026.
 
 BRASIL. **Decreto nº 8.777, de 11 de maio de 2016**. Institui a Política de Dados Abertos do Poder Executivo federal. Brasília, DF: Presidência da República, 2016. Disponível em: https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2016/decreto/d8777.htm. Acesso em: 11 abr. 2026.
 
-BRASIL. **Lei nº 12.527, de 18 de novembro de 2011**. Regula o acesso a informações [...] (Lei de Acesso à Informação). Brasília, DF: Presidência da República, 2011. Disponível em: http://www.planalto.gov.br/ccivil_03/_ato2011-2014/2011/lei/l12527.htm. Acesso em: 5 abr. 2026.
+BRASIL. **Lei nº 12.527, de 18 de novembro de 2011**. Regula o acesso a informações previsto no inciso XXXIII do art. 5º, no inciso II do § 3º do art. 37 e no § 2º do art. 216 da Constituição Federal. Brasília, DF: Presidência da República, 2011. Disponível em: http://www.planalto.gov.br/ccivil_03/_ato2011-2014/2011/lei/l12527.htm. Acesso em: 5 abr. 2026.
 
 BRASIL. **Lei nº 13.709, de 14 de agosto de 2018**. Lei Geral de Proteção de Dados Pessoais (LGPD). Brasília, DF: Presidência da República, 2018. Disponível em: http://www.planalto.gov.br/ccivil_03/_ato2015-2018/2018/lei/l13709.htm. Acesso em: 5 abr. 2026.
 
 BRASIL. Senado Federal. **Projeto de Lei nº 2.338, de 2023**. Dispõe sobre o uso da Inteligência Artificial. Brasília, DF: Senado Federal, 2023. Disponível em: https://www25.senado.leg.br/web/atividade/materias/-/materia/157233. Acesso em: 5 abr. 2026.
 
-CONSELHO NACIONAL DE JUSTIÇA (CNJ). **Recomendação nº 144/2023**. Pacto Nacional do Judiciário pela Linguagem Simples. Brasília: CNJ, 2023. Disponível em: https://www.cnj.jus.br/wp-content/uploads/2023/11/pacto-nacional-do-judiciario-pela-linguagem-simples.pdf. Acesso em: 5 abr. 2026.
+CONSELHO NACIONAL DE JUSTIÇA. **Recomendação nº 144, de 28 de agosto de 2023**. Pacto Nacional do Judiciário pela Linguagem Simples. Brasília: CNJ, 2023. Disponível em: https://www.cnj.jus.br/wp-content/uploads/2023/11/pacto-nacional-do-judiciario-pela-linguagem-simples.pdf. Acesso em: 5 abr. 2026.
 
-DI PIETRO, Maria Sylvia Zanella. **Direito Administrativo**. 22. ed. São Paulo: Atlas, 2009. Disponível em: https://www.kufunda.net/publicdocs/Direito_Administrativo_-_Livro_Maria_Silvia_Di_Pietro.pdf. Acesso em: 5 abr. 2026.
+DI PIETRO, Maria Sylvia Zanella. **Direito Administrativo**. 22. ed. São Paulo: Atlas, 2009.
 
-LAI, J.; GAN, W.; WU, J.; QI, Z.; YU, P. S. Large Language Models in Law: A Survey. **arXiv preprint arXiv:2312.03718**, 2023. Disponível em: https://arxiv.org/abs/2312.03718. Acesso em: 5 abr. 2026.
+LAI, Jinqi; GAN, Wensheng; WU, Jiayang; QI, Zhenlian; YU, Philip S. Large Language Models in Law: a survey. **arXiv preprint arXiv:2312.03718**, 2023. Disponível em: https://arxiv.org/abs/2312.03718. Acesso em: 5 abr. 2026.
 
-MARTINS, Ives Gandra da Silva. O Princípio da Publicidade na Administração Pública. **Revista Brasileira de Direito Constitucional - RBDC**, São Paulo, n. 08, 2006. Disponível em: http://www.esdc.com.br/RBDC/RBDC-08/RBDC-08-013-Ives_Gandra_da_Silva_Martins.pdf. Acesso em: 5 abr. 2026.
+MARTINS, Ives Gandra da Silva. O Princípio da Publicidade na Administração Pública. **Revista Brasileira de Direito Constitucional**, São Paulo, n. 8, 2006. Disponível em: http://www.esdc.com.br/RBDC/RBDC-08/RBDC-08-013-Ives_Gandra_da_Silva_Martins.pdf. Acesso em: 5 abr. 2026.
 
-MEDAUAR, Odete. **Direito Administrativo Moderno**. 21. ed. São Paulo: RT, 2018. Disponível em: https://www.academia.edu/39023542/DIREITO_ADMINISTRATIVO_MODERNO. Acesso em: 5 abr. 2026.
+MEDAUAR, Odete. **Direito Administrativo Moderno**. 21. ed. São Paulo: Revista dos Tribunais, 2018.
 
-MEIRELLES, Hely Lopes. **Direito Administrativo Brasileiro**. 42. ed. São Paulo: Malheiros, 2016. Disponível em: https://www.direito.mppr.mp.br/arquivos/File/DireitoAdministrativoBrasileiro.pdf. Acesso em: 5 abr. 2026.
+MEIRELLES, Hely Lopes. **Direito Administrativo Brasileiro**. 42. ed. São Paulo: Malheiros, 2016.
 
-SUN, X. et al. **[Título do Artigo]**. [Nome do Periódico/Evento], [Local], [ano]. [REFERÊNCIA FALTANTE - INSERIDA PARA ADEQUAÇÃO À CITAÇÃO NO TEXTO].
+SILVA, José Afonso da. A Lei. **Revista de Direito Administrativo**, Rio de Janeiro, v. 215, p. 9-18, jan./mar. 1999. Disponível em: https://periodicos.fgv.br/rda/article/view/47300. Acesso em: 22 ago. 2026.
+
+> **Nota sobre citação indireta.** A passagem de Celso Lafer transcrita no item 2.1 foi consultada na obra de MEDAUAR (2018, p. 125), sendo referenciada nos termos da NBR 6023, que prescreve o registro do documento efetivamente consultado.
+
+---
+
+## APÊNDICE A: REPRODUÇÃO DOS RESULTADOS
+
+### A.1. Estrutura do repositório
+
+| Caminho | Conteúdo |
+|---|---|
+| `directives/` | **Camada 1.** Finalidade do tratamento, limites legais e critérios de auditoria. |
+| `.agents/rules/` | **Camada 2.** Regras vinculantes do agente orquestrador. |
+| `execution/` | **Camada 3.** Rotinas determinísticas de coleta e transformação. |
+| `dados/snapshot_2026-03-22/` | Universo congelado da pesquisa, com manifesto e SHA-256 por exercício. |
+| `dados/perfis/` | Dossiês por parlamentar, panorama da Casa e planilha consolidada. |
+| `executar.py` | Ponto de entrada único do pipeline. |
+| `docs/monografia/` | Texto integral da pesquisa, fonte canônica do README. |
+| `scripts_aux/` | Montagem do README e restauração do snapshot. |
+| `GOVERNANCE.md` | Arquitetura em três camadas e vedações do projeto. |
+| `requirements.txt` | Dependências externas do pipeline. |
+| `LICENSE` | Licença MIT. |
+
+### A.2. Requisitos
+
+Testado em **Python 3.11.9** sobre Windows 10. Requer Python 3.6 ou superior, e recomenda-se 3.9 ou superior. As dependências resumem-se a duas bibliotecas:
+
+```bash
+pip install -r requirements.txt
+```
+
+Os scripts resolvem caminhos em relação à raiz do repositório e podem ser executados de qualquer diretório. Não há variáveis de ambiente, credenciais ou chaves de acesso a configurar, pois o serviço de dados da ALEP é público e irrestrito.
+
+### A.3. Sequência de execução
+
+Um comando percorre todas as fases:
+
+```bash
+python executar.py
+```
+
+Quem preferir executar fase a fase, ou auditar cada etapa isoladamente, encontra
+abaixo o detalhamento. Há dois modos, e a escolha determina o que se obtém.
+
+**Modo A, reproduzir o universo publicado.** Restaura as matrizes congeladas em 22/03/2026 e dispensa a Fase 1:
+
+```bash
+python scripts_aux/restaurar_snapshot.py
+```
+
+O script descompacta as matrizes na camada efêmera e confere o SHA-256 de cada exercício contra o manifesto, abortando em caso de divergência.
+
+**Modo B, coletar o universo atual.** Executa a Fase 1 contra o serviço vivo, e produzirá universo maior que o publicado, na medida em que o exercício de 2026 avançou desde o corte de março:
+
+```bash
+python execution/coletar_proposicoes_api.py
+```
+
+A partir daí, ambos os modos seguem idênticos:
+
+```bash
+python execution/coletar_detalhes_api.py
+```
+
+```bash
+python execution/coletar_normas_api.py
+```
+
+```bash
+python execution/agrupar_dados_dashboard.py
+```
+
+**Fase 1, ingestão.** Cria a camada efêmera (`.tmp/`), dispara requisições ao serviço e descarrega as matrizes JSON de todas as proposições, ano a ano.
+
+**Fase 2, enriquecimento.** Percorre os códigos coletados e recupera, para cada proposição, o histórico de tramitação e os vínculos normativos, com paralelismo controlado. Arquivos já presentes são preservados, o que torna a rotina reentrante. Ao final, ela informa quantos registros faltaram e sinaliza a pendência por código de saída.
+
+**Fase 3, normas legais.** Consolida a base de normas sancionadas no período, para referência cruzada.
+
+**Fase 4, consolidação.** Aplica a fragmentação de autoria, segrega iniciativas institucionais, classifica por espécie proposicional, grava os metadados de procedência e serializa a carga útil estática.
+
+**Fase 5, dossiês.** Converte a carga útil em arquivos de texto legíveis por pessoas e por modelos de linguagem, um por parlamentar, mais um panorama da Casa e uma planilha consolidada. Essa saída atende ao leitor que prefere perguntar a navegar: anexado a um assistente de IA, o dossiê permite consulta em linguagem natural sobre a atuação de cada parlamentar. Os arquivos contêm fatos registrais e nenhuma qualificação, de modo que qualquer juízo emitido na conversa é do assistente e de quem pergunta, não do sistema que organizou os dados. A distinção preserva, na ponta de consumo, a mesma fronteira que o capítulo 4 estabelece na arquitetura.
+
+### A.4. Verificação independente
+
+Os números do capítulo 6 podem ser conferidos sem execução do pipeline, diretamente sobre os arquivos brutos da camada efêmera. A recontagem dos vínculos autor-proposição a partir dos JSONs de origem, sem uso do código do projeto, reproduziu o total de 22.128 registros consolidados, o que confirma a integridade aritmética da Fase 4.
 
 ---
 
-## 🏗 Estrutura do Repositório (Apêndice A)
-
-*   `/directives/`: Diretrizes de negócio, SOPs, conformidade legal e critérios de auditoria.
-*   `/execution/`: Scripts Python determinísticos focados na coleta (API) e transformação (ETL).
-*   `/docs/`:
-    *   `/monografia/`: Textos originais e revisões da pesquisa.
-    *   `/assets/`: Fluxogramas e recursos visuais em formato de imagem.
-*   `/scripts_aux/`: Scripts auxiliares de manutenção e tratamento de texto.
-*   `.gitignore`: Filtro de exclusão de arquivos de dados pesados e efêmeros (`.tmp/`, `DADOS_ALEP_20.js`, `Citações/`).
-*   `GOVERNANCE.md`: Regras de orquestração do pipeline de dados e arquitetura.
-*   `README.md`: Este arquivo com o estudo completo integrado.
-
----
-*Estudo acadêmico-tecnológico desenvolvido para fins de transparência material e cognitiva no controle social.*
+*Estudo acadêmico-tecnológico desenvolvido para fins de transparência material
+e cognitiva no controle social. Documento gerado a partir de
+`docs/monografia/MONOGRAFIA.md`. Edite a fonte, não este arquivo.*

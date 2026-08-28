@@ -1,24 +1,62 @@
 # Regra: Framework E.N.E.I.A.S.
 
-Esta regra rege o comportamento deste agente para garantir conformidade jurídica e técnica.
+Esta regra rege o comportamento do agente orquestrador (Camada 2) para garantir conformidade
+jurídica e técnica. Ver `GOVERNANCE.md` para a arquitetura completa.
 
-## 1. Governança de Dados (LGPD)
-- **Diferenciação**: Dados Pessoais vs. Dados Públicos (Princípio da Publicidade).
-- **Armazenamento**: Use APENAS o diretório `.tmp/` para arquivos intermediários e dados brutos.
-- **Destruição**: Ao finalizar a tarefa, informe que os dados brutos em `.tmp/` podem ser descartados.
+## 0. A fronteira do seu ofício
 
-## 2. Faseamento de Tarefase
-- **ENE**: Jamais realize extrações complexas manualmente. Use scripts em `execution/`.
-- **IAS**: Utilize sua capacidade analítica para interpretar os resultados dos scripts, nunca para inventar dados.
+Você opera na **camada de orquestração**. Sua competência é de meio: decidir o que executar,
+em que ordem, e como reagir a falhas.
 
-## 3. Ciclo de Auditoria
-1.  **Check**: Verificar se existe diretriz em `directives/`.
-2.  **Execute**: Chamar scripts em `execution/`.
-3.  **Analyze**: Investigar resultados (IAS).
-4.  **Report**: Gerar entregáveis limpos de dados sensíveis desnecessários.
+Você **não** decide o que é verdade sobre um parlamentar identificado. Essa é a camada de
+adjudicação, e ela pertence às rotinas determinísticas em `execution/`.
 
-## 4. Auto-Reparo (Self-Annealing)
-Se um portal de transparência ou API falhar:
-- Identifique a mudança técnica.
+O critério prático: se um erro seu produzir ausência, atraso ou reprocessamento, você está no
+seu domínio. Se puder produzir uma afirmação incorreta ao lado do nome de uma pessoa, você
+saiu dele.
+
+## 1. Governança de dados (LGPD)
+
+- **Diferenciação:** dados pessoais vs. dados públicos (Princípio da Publicidade).
+- **Publicidade não é autorização:** o dado ser público não torna livre o que se faz com ele
+  (LGPD, art. 7º, § 3º).
+- **Armazenamento:** use APENAS `.tmp/` para arquivos intermediários e dados brutos.
+- **Minimização:** ao gerar entregáveis, inclua somente os campos necessários à finalidade
+  declarada na diretriz. Antropônimos de terceiros alheios ao objeto da auditoria devem ser
+  suprimidos.
+- **Destruição:** ao finalizar a tarefa, informe que os dados brutos em `.tmp/` podem ser
+  descartados.
+
+## 2. Faseamento de tarefas
+
+- **ENE (Extração Nativa):** jamais realize extrações complexas manualmente. Use scripts em
+  `execution/`.
+- **IAS (Investigação e Aprendizado Supervisionado):** utilize sua capacidade analítica para
+  interpretar os resultados dos scripts — **nunca para inventar dados**.
+- **Lacuna declarada:** se uma coleta falhar parcialmente, reporte a extensão exata da falha.
+  É proibido estimar, interpolar ou inferir o dado ausente. Lacuna declarada é sempre
+  preferível a lacuna preenchida.
+
+## 3. Ciclo de auditoria
+
+1. **Check:** verificar se existe diretriz em `directives/`.
+2. **Execute:** chamar scripts em `execution/`.
+3. **Analyze:** investigar resultados (IAS).
+4. **Report:** gerar entregáveis limpos de dados sensíveis desnecessários, com as lacunas
+   explicitamente declaradas.
+
+## 4. Auto-reparo (Self-Annealing)
+
+Se um portal de transparência ou API falhar, ou se o contrato de resposta divergir do esperado:
+
+- Identifique a mudança técnica **comparando o contrato efetivo da API com as chaves lidas pelo
+  código** — divergências de nome de campo falham em silêncio e descartam dados sem lançar
+  exceção.
 - Atualize o script em `execution/`.
 - Documente a mudança na diretriz correspondente.
+
+## 5. Cortesia com servidores públicos
+
+Respeite os limites de concorrência e intervalo entre requisições definidos na diretriz
+aplicável. Falhas de conexão devem ser **registradas e contabilizadas**, nunca absorvidas
+silenciosamente por tratamento genérico de exceção.

@@ -1,192 +1,136 @@
+# -*- coding: utf-8 -*-
+"""
+Monta o README.md do repositorio a partir da fonte canonica da monografia.
+
+A fonte (docs/monografia/MONOGRAFIA.md) ja e Markdown valido: os titulos
+nascem com o nivel correto de cabecalho. Este script nao reformata nada --
+apenas envolve o texto no cabecalho de apresentacao do repositorio.
+
+Historico: a versao anterior tentava inferir os cabecalhos por expressao
+regular sobre texto plano, e a classe de caracteres empregada nao cobria
+'E' com acento circunflexo nem os sinais ':' e '.'. Em consequencia, os
+capitulos 2, 4, 5 e 8 eram publicados como paragrafo comum. Manter a fonte
+em Markdown elimina a categoria inteira de defeito.
+"""
+
 import os
-import re
 
-# Caminhos dos arquivos
-base_dir = r"c:\Users\Marcus Schneider\Documents\Marcus\2026\Projetos Antigravity\ALEP"
-input_path = os.path.join(base_dir, "docs", "monografia", "Projeto_ALEP_Revisao_08_06_2026.txt")
-output_path = os.path.join(base_dir, "README.md")
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+INPUT_PATH = os.path.join(BASE_DIR, "docs", "monografia", "MONOGRAFIA.md")
+OUTPUT_PATH = os.path.join(BASE_DIR, "README.md")
 
-# Diagramas Mermaid para embutir
-DIAGRAM_ARQUITETURA = """
-```mermaid
-flowchart TD
-    ALEP[("API REST ALEP - Fonte")]
+CABECALHO = """# Projeto ALEP: Inteligência Artificial como Meio de Civilidade
 
-    subgraph Fase1_2["Fase 1 e 2: Ingestão e Governança Efêmera"]
-        Script1["coletar_proposicoes_api.py"]
-        TMP[/"Diretório Temporário - Data Lake Efêmero"/]
-    end
+Repositório oficial do Projeto ALEP: uma ferramenta de código aberto para
+estruturação, auditoria e exibição transparente dos dados legislativos da
+Assembleia Legislativa do Estado do Paraná (ALEP), acompanhada da pesquisa
+que a fundamenta.
 
-    subgraph Fase3["Fase 3: Enriquecimento Assíncrono"]
-        Script2["coletar_detalhes_api.py"]
-        Threads["Pool de Paralelismo - ThreadPoolExecutor"]
-    end
+O trabalho propõe uma **orientação técnica e jurídica** para o emprego de
+Inteligência Artificial em sistemas de controle social. Sua tese central é uma
+regra de alocação: a IA opera legitimamente na camada de **orquestração** de um
+sistema cívico, e é interditada na camada de **adjudicação**, em que fatos são
+imputados a agentes públicos identificados. Essa camada exige processamento
+determinístico, reprodutível e integralmente explicável.
 
-    subgraph Fase4["Fase 4: Processamento Estrutural - ETL"]
-        Script3["agrupar_dados_dashboard.py"]
-        ETL_Steps["Higienização de Strings, Fragmentação e Categorização"]
-        Payload["Static Payload - Dicionário Consolidado"]
-    end
+| | |
+|---|---|
+| **Recorte** | 20ª Legislatura da ALEP (2023–2026) |
+| **Fonte** | Serviço público `webservices.assembleia.pr.leg.br/api/public` |
+| **Corpus** | 15.369 proposições · 129.980 eventos de tramitação · 1.677 normas |
+| **Licença** | MIT (ver [LICENSE](LICENSE)) |
 
-    subgraph Fase5["Fase 5: Interface Gráfica - Dashboard"]
-        HTML["dashboard.html"]
-        Browser["Navegador do Eleitor - Renderização Estática"]
-    end
+---
 
-    ALEP -- "Requisição HTTP via JSON" --> Script1
-    Script1 -- "Despejo de Matrizes Brutas - Privacy by Design" --> TMP
-    TMP --> Script2
-    Script2 -- "Consultas Paralelas de Trâmites" --> Threads
-    Threads -- "Dados Enriquecidos" --> Script3
-    Script3 --> ETL_Steps
-    ETL_Steps -- "Serialização" --> Payload
-    Payload -- "Injeção de Dados Estáticos" --> HTML
-    HTML -- "Transparência Cognitiva" --> Browser
+## Instalar e rodar
 
-    classDef script fill:#f9f,stroke:#333,stroke-width:2px;
-    classDef storage fill:#ff9,stroke:#333,stroke-width:2px;
-    class TMP,Payload storage;
-    class Script1,Script2,Script3 script;
+O projeto não depende de servidor, banco de dados, credenciais ou chave de
+acesso. O serviço de dados da ALEP é público e irrestrito. É preciso apenas
+Python 3.6 ou superior, e duas bibliotecas.
+
+```bash
+git clone https://github.com/MarcusSchneiderAdv/ALEP_ENEIAS.git
 ```
+
+```bash
+cd ALEP_ENEIAS && pip install -r requirements.txt
+```
+
+Feito isso, escolha uma das duas formas de obter os dados. Ambas executam o
+pipeline inteiro sozinhas, sem passo manual.
+
+**Coletar os dados atuais.** Consulta a Assembleia e devolve o estado de hoje.
+O universo será maior que o da pesquisa, porque a legislatura segue em curso.
+
+```bash
+python executar.py
+```
+
+**Usar os dados publicados.** Restaura o universo de 15.369 proposições sobre o
+qual a monografia foi escrita, com integridade conferida por resumo
+criptográfico. É o caminho de quem quer auditar os números publicados.
+
+```bash
+python executar.py --snapshot
+```
+
+Em ambos os casos o programa consulta a Assembleia para obter o estado
+processual de cada proposição, o que exige uma requisição por proposição. Numa
+coleta do zero isso leva cerca de **50 minutos**, com intervalos entre as
+requisições para não sobrecarregar os servidores do Estado. A rotina preserva o
+que já baixou, de modo que pode ser interrompida e retomada sem perda.
+
+### O que você recebe
+
+**Um painel visual.** Abra `index.html` no navegador. Traz a produção por
+parlamentar, distribuição por espécie, conversão em norma e a linha do tempo de
+tramitação de cada proposição.
+
+**Dossiês para consultar com Inteligência Artificial.** Em `dados/perfis/`,
+um arquivo por parlamentar, mais um panorama da Casa e uma planilha consolidada.
+Anexe o arquivo do parlamentar a um assistente de IA e pergunte em linguagem
+natural: quais normas de autoria dele foram sancionadas e sobre o que tratam,
+qual a proporção entre projetos de lei e requerimentos, que assuntos concentram
+seus requerimentos. As instruções de uso e as ressalvas de leitura estão em
+[`dados/perfis/LEIAME.md`](dados/perfis/LEIAME.md).
+
+> Os dossiês descrevem, não qualificam. Não contêm nota, ranking nem juízo de
+> desempenho, e isso é deliberado: a qualificação pertence ao cidadão, não ao
+> sistema que organiza os dados. O capítulo 4 explica por quê.
+
+As matrizes versionadas em `dados/snapshot_2026-03-22/` existem para auditoria do
+que foi publicado, não para uso corrente. Quem quiser trabalhar com dados atuais
+deve rodar a coleta.
+
+---
+
 """
 
-DIAGRAM_GOVERNANCA = """
-```mermaid
-flowchart LR
-    RawData[/"Dados Brutos da API - JSON Não Tratado"/]
-    
-    subgraph GovEf["Governança Efêmera - Privacy by Design"]
-        DirTMP[("Data Lake Transitório - Pasta .tmp")]
-        Purge["Expurgo Contínuo - Mitigação de Retenção"]
-    end
+RODAPE = """
 
-    subgraph AudTransp["Processamento Determinístico e Auditável"]
-        Regras["Regras Estruturais Fixas - Sem Viés de IA"]
-        Separacao["Separação por Tipologia - Leis, Requerimentos"]
-        OpenSource["Repositório Open Source - Transparência Algorítmica"]
-    end
+---
 
-    Metric["Painel de Jurimetria Cívica - Sem Nomes de Terceiros / LGPD"]
-
-    RawData -- "Ingestão" --> DirTMP
-    DirTMP -. "Recriação e Limpeza" .-> Purge
-    DirTMP -- "Consumo para ETL" --> Regras
-    Regras --> Separacao
-    Separacao -- "Código Aberto Auditável" --> OpenSource
-    Separacao -- "Dados Minimizados" --> Metric
-    
-    classDef secure fill:#e1f5fe,stroke:#0288d1,stroke-width:2px;
-    classDef logic fill:#fff3e0,stroke:#f57c00,stroke-width:2px;
-    class DirTMP,Purge,Metric secure;
-    class Regras,Separacao,OpenSource logic;
-```
+*Estudo acadêmico-tecnológico desenvolvido para fins de transparência material
+e cognitiva no controle social. Documento gerado a partir de
+`docs/monografia/MONOGRAFIA.md`. Edite a fonte, não este arquivo.*
 """
 
-DIAGRAM_COAUTORIA = """
-```mermaid
-flowchart TD
-    Input[/"Matriz JSON de Proposição - Lista de Autores"/]
-
-    Iteracao{"Para cada parlamentar na lista"}
-    Check{"O Índice é igual a zero?"}
-    AutorPrincipal["Registrar como Autor Principal - Flag False"]
-    Coautor["Registrar como Coautor - Flag True"]
-    Dicionario[/"DICIONARIO_DEPUTADOS - Métricas Atualizadas"/]
-
-    Input --> Iteracao
-    Iteracao --> Check
-    Check -- "Sim" --> AutorPrincipal
-    Check -- "Não - Índice maior que zero" --> Coautor
-    AutorPrincipal --> Dicionario
-    Coautor --> Dicionario
-
-    classDef process fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px;
-    class Iteracao,Check process;
-```
-"""
 
 def main():
-    with open(input_path, "r", encoding="utf-8") as f:
-        content = f.read()
+    with open(INPUT_PATH, "r", encoding="utf-8") as f:
+        monografia = f.read().strip()
 
-    # Separar o apêndice de fluxogramas original se existir (para não duplicar)
-    content_main = content.split("--- APÊNDICE: FLUXOGRAMAS E.N.E.I.A.S. ---")[0].strip()
+    # A fonte abre com titulo, subtitulo e epigrafe, seguidos do primeiro
+    # separador horizontal. No README esse bloco seria um segundo H1,
+    # redundante com o cabecalho do repositorio -- entao e descartado.
+    if "\n---\n" in monografia:
+        monografia = monografia.split("\n---\n", 1)[1].strip()
 
-    # Formatar títulos e subtítulos da Monografia para Markdown
-    # Exemplo: "1. INTRODUÇÃO" -> "## 1. INTRODUÇÃO"
-    # "1.1. O Problema..." -> "### 1.1. O Problema..."
-    lines = content_main.split("\n")
-    formatted_lines = []
-    
-    for line in lines:
-        line_strip = line.strip()
-        # Se for um título principal (ex: 1. INTRODUÇÃO)
-        if re.match(r"^\d+\.\s+[A-ZÂÃÇÉÍÓÚ\s]+$", line_strip):
-            formatted_lines.append(f"\n## {line_strip}\n")
-        # Se for um subtítulo de segundo nível (ex: 1.1. O Problema...)
-        elif re.match(r"^\d+\.\d+\.\s+[A-Z]", line_strip):
-            formatted_lines.append(f"\n### {line_strip}\n")
-        # Se for um subtítulo de terceiro nível (ex: 5.3.1. Orquestração...)
-        elif re.match(r"^\d+\.\d+\.\d+\.\s+[A-Z]", line_strip):
-            formatted_lines.append(f"\n#### {line_strip}\n")
-        else:
-            formatted_lines.append(line)
+    with open(OUTPUT_PATH, "w", encoding="utf-8") as f:
+        f.write(CABECALHO + monografia + RODAPE)
 
-    full_text = "\n".join(formatted_lines)
+    print("README.md gerado a partir de %s" % os.path.relpath(INPUT_PATH, BASE_DIR))
 
-    # Inserção inteligente dos diagramas e fluxogramas
-    
-    # 1. Fluxograma de Governança (LGPD) em "4.3. Conformidade Regulatória no Tratamento de Dados Governamentais (LGPD e PL 2338/2023)"
-    # Encontra o final da seção 4.3 e insere o diagrama
-    target_lgpd = "respeita integralmente o rigor ético, legal e regulatório do Estado brasileiro."
-    lgpd_diagram_block = f"\n\n#### **Fluxograma 03: Governança de Dados e Conformidade (LGPD)**\n\n{DIAGRAM_GOVERNANCA}\n\n*Figura 3: Representação visual do fluxo de dados efêmeros sob as diretrizes de privacidade por design.*\n\n"
-    full_text = full_text.replace(target_lgpd, target_lgpd + lgpd_diagram_block)
-
-    # 2. Fluxograma de Processamento de Coautoria em "5.2. Processamento Estrutural e Classificação Temática"
-    target_coautoria = "eliminando omissões estatísticas sem a necessidade de intervenção humana."
-    coautoria_diagram_block = f"\n\n#### **Fluxograma 02: Lógica de Processamento Estrutural (Coautoria)**\n\n{DIAGRAM_COAUTORIA}\n\n*Figura 2: Diagrama de decisão sobre a fragmentação e distribuição de mérito de coautoria.*\n\n"
-    full_text = full_text.replace(target_coautoria, target_coautoria + coautoria_diagram_block)
-
-    # 3. Fluxograma de Arquitetura ENEIAS em "5.3.1. Orquestração e Sequência de Execução do Pipeline"
-    # A Figura 1 ilustra a arquitetura E.N.E.I.A.S. em sua totalidade...
-    target_arquitetura = "culmina na entrega da carga útil estática na interface do usuário."
-    arquitetura_diagram_block = f"\n\n#### **Fluxograma 01: Arquitetura Geral E.N.E.I.A.S.**\n\n{DIAGRAM_ARQUITETURA}\n\n*Figura 1: Visão geral da arquitetura E.N.E.I.A.S. e fluxo de dados do backend ao front-end.*\n\n"
-    full_text = full_text.replace(target_arquitetura, target_arquitetura + arquitetura_diagram_block)
-
-    # Construir o README.md final
-    readme_template = f"""# Projeto ALEP: Ecossistema Nativo de Extração, Investigação e Aprendizado Supervisionado (E.N.E.I.A.S.)
-
-Repositório oficial do Projeto ALEP. Este projeto consiste em uma ferramenta tecnológica de código aberto (Open Source) voltada para a estruturação, auditoria e exibição transparente dos dados legislativos da Assembleia Legislativa do Estado do Paraná (ALEP).
-
----
-
-## 📖 Monografia e Estudo de Caso
-
-Abaixo, encontra-se a monografia completa detalhando os fundamentos jurídicos, teóricos e a arquitetura tecnológica do ecossistema E.N.E.I.A.S.
-
-{full_text}
-
----
-
-## 🏗 Estrutura do Repositório (Apêndice A)
-
-*   `/directives/`: Diretrizes de negócio, SOPs, conformidade legal e critérios de auditoria.
-*   `/execution/`: Scripts Python determinísticos focados na coleta (API) e transformação (ETL).
-*   `/docs/`:
-    *   `/monografia/`: Textos originais e revisões da pesquisa.
-    *   `/assets/`: Fluxogramas e recursos visuais em formato de imagem.
-*   `/scripts_aux/`: Scripts auxiliares de manutenção e tratamento de texto.
-*   `.gitignore`: Filtro de exclusão de arquivos de dados pesados e efêmeros (`.tmp/`, `DADOS_ALEP_20.js`, `Citações/`).
-*   `GOVERNANCE.md`: Regras de orquestração do pipeline de dados e arquitetura.
-*   `README.md`: Este arquivo com o estudo completo integrado.
-
----
-*Estudo acadêmico-tecnológico desenvolvido para fins de transparência material e cognitiva no controle social.*
-"""
-
-    with open(output_path, "w", encoding="utf-8") as f:
-        f.write(readme_template)
-    print("README.md gerado com sucesso com a monografia e os fluxogramas integrados!")
 
 if __name__ == "__main__":
     main()
