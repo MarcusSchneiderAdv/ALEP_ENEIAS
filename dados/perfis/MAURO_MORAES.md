@@ -1,0 +1,99 @@
+# MAURO MORAES (UNIÃO)
+
+Dossie de atuacao parlamentar. 20a Legislatura da Assembleia Legislativa do Parana.
+Proposicoes de 2023 a 2026. Datas de extracao e de observacao do estado processual constam
+de `_PANORAMA.md`, no mesmo diretorio.
+
+## Numeros
+
+| Indicador | Valor |
+|---|---:|
+| Proposicoes vinculadas | 46 |
+| Como autor primario | 16 |
+| Como coautor | 30 |
+| Normas sancionadas vinculadas | 2 |
+| Arquivadas | 32 |
+| Em tramitacao | 14 |
+
+## Distribuicao por especie
+
+| Especie | Quantidade |
+|---|---:|
+| EMENDA DE PLENÁRIO | 20 |
+| REQUERIMENTO | 13 |
+| PROJETO DE LEI | 11 |
+| PROPOSTA DE EMENDA À CONSTITUIÇÃO | 1 |
+| PROJETO DE LEI COMPLEMENTAR | 1 |
+
+## Normas sancionadas (2)
+
+- **Lei 22701/2025** (13/10/2025) - Sancionada
+  - INSERE NO CALENDÁRIO OFICIAL DE EVENTOS TURÍSTICOS DO PARANÁ A OKTOBERFEST FRANCISCO BELTRÃO, COMEMORADA ANUALMENTE NA SEGUNDA SEMANA DO MÊS DE OUTUBRO.
+  - Origem: PROJETO DE LEI 383/2025
+- **Lei 22449/2025** (04/06/2025) - Sancionada
+  - INSTITUI O DIA 13 DE JULHO COMO O DIA MÚSICA E VIOLA CAIPIRA NO ÂMBITO DO ESTADO DO PARANÁ.
+  - Origem: PROJETO DE LEI 50/2025
+
+## Proposicoes normativas (13)
+
+Projetos de lei e demais especies que inovam o ordenamento, listados
+individualmente com ementa.
+
+- **PROJETO DE LEI COMPLEMENTAR 1/2026** (autoria, tramitando)
+  - REGULAMENTA, NO ÂMBITO DO ESTADO DO PARANÁ, O DISPOSTO NO ART. 8º-A DA LEI COMPLEMENTAR FEDERAL Nº 173, DE 27 DE MAIO DE 2020, COM REDAÇÃO DADA PELA LEI COMPLEMENTAR FEDERAL Nº 226, DE 12 DE JANEIRO DE 2026, E DISPÕE SOBRE O PAGAMENTO RETROATIVO DE VANTAGENS FUNCIONAIS POR TEMPO DE SERVIÇO REFERENTES AO PERÍODO DE 28 DE MAIO DE 2020 A 31 DE DEZEMBRO DE 2021.
+- **PROJETO DE LEI 143/2026** (autoria, tramitando)
+  - RECONHECE O MUNICÍPIO DE CÉU AZUL COMO CAPITAL DO OXIGÊNIO NO ESTADO DO PARANÁ.
+- **PROPOSTA DE EMENDA À CONSTITUIÇÃO 2/2025** (coautoria, tramitando)
+  - DÁ NOVA REDAÇÃO AO INCISO XII DO ART. 34 DA CONSTITUIÇÃO DO ESTADO DO PARANÁ.
+- **PROJETO DE LEI 50/2025** (coautoria, arquivada | virou norma)
+  - INSTITUI O DIA 13 DE JULHO COMO O DIA MÚSICA E VIOLA CAIPIRA NO ÂMBITO DO ESTADO DO PARANÁ.
+- **PROJETO DE LEI 333/2025** (coautoria, tramitando)
+  - ALTERA E ACRESCENTA DISPOSITIVOS À LEI Nº 21.964, DE 30 DE ABRIL DE 2024, QUE INSTITUI O CÓDIGO DA PESSOA COM TRANSTORNO DO ESPECTRO AUTISTA DO ESTADO DO PARANÁ, PARA APRIMORAR A POLÍTICA ESTADUAL DE ATENDIMENTO À PESSOA COM TEA E ASSEGURAR DIREITOS RELACIONADOS À SAÚDE, EDUCAÇÃO, ASSISTÊNCIA SOCIAL E INCLUSÃO.
+- **PROJETO DE LEI 360/2025** (coautoria, arquivada)
+  - CONCEDE O TÍTULO DE CIDADÃ HONORÁRIA DO ESTADO DO PARANÁ À SENHORA MARIANGELA HUNGRIA DA CUNHA.
+- **PROJETO DE LEI 383/2025** (coautoria, arquivada | virou norma)
+  - INCLUI NO CALENDÁRIO OFICIAL DO ESTADO DO PARANÁ A “OKTOBERFEST FRANCISCO BELTRÃO”, A SER COMEMORADA ANUALMENTE NA SEGUNDA SEMANA DO MÊS DE OUTUBRO.
+- **PROJETO DE LEI 430/2025** (coautoria, tramitando)
+  - DENOMINA BIBLIOTECA PÚBLICA ESTADUAL DALTON TREVISAN A ATUAL BIBLIOTECA PÚBLICA DO PARANÁ LOCALIZADA NO MUNICÍPIO DE CURITIBA.
+- **PROJETO DE LEI 1232/2025** (autoria, tramitando)
+  - INSTITUI A INDENIZAÇÃO PELA PERDA DE VITALIDADE AOS MILITARES ESTADUAIS DA RESERVA REMUNERADA, REFORMADOS E SEUS PENSIONISTAS, E ADOTA OUTRAS PROVIDÊNCIAS.
+- **PROJETO DE LEI 1233/2025** (autoria, tramitando)
+  - ASSEGURA ISONOMIA DE TRATAMENTO AOS MILITARES ESTADUAIS DA RESERVA REMUNERADA, REFORMADOS E PENSIONISTAS NO ENQUADRAMENTO POR CLASSES DA LEI ESTADUAL Nº 22.187, DE 13 DE NOVEMBRO DE 2024, E ADOTA OUTRAS PROVIDÊNCIAS.
+- **PROJETO DE LEI 1234/2025** (autoria, tramitando)
+  - DISPÕE SOBRE A REESTRUTURAÇÃO DA COMPOSIÇÃO DO SUBSÍDIO DOS MILITARES ESTADUAIS DO PARANÁ, ESTABELECE CRITÉRIOS DE ESCALONAMENTO VERTICAL, DEFINE REAJUSTES COM BASE EM ÍNDICES INFLACIONÁRIOS PROJETADOS E INSTITUI PARÂMETROS PARA O PAGAMENTO DE BOLSA-AUXÍLIO AOS MILITARES EM FORMAÇÃO, NOS TERMOS DA LEI ESTADUAL Nº 22.187/2024 E DA LEI FEDERAL Nº 14.751/2023.
+- **PROJETO DE LEI 3/2023** (autoria, tramitando)
+  - ALTERA A LEI ESTADUAL Nº 1.943, DE 23 DE JULHO DE 1954, QUE INSTITUI A LEI DE INGRESSO NA POLÍCIA MILITAR DO ESTADO DO PARANÁ E DÁ PROVIDÊNCIAS CORRELATAS.
+- **PROJETO DE LEI 4/2023** (autoria, tramitando)
+  - DISPÕE SOBRE A POSSIBILIDADE DE OS ÓRGÃOS DE SEGURANÇA PÚBLICA ALIENAREM, POR VENDA DIRETA A SEUS INTEGRANTES, AS ARMAS DE FOGO DE PORTE POR ELES UTILIZADAS QUANDO EM SERVIÇO ATIVO, POR OCASIÃO DE SUBSTITUIÇÃO POR ARMA NOVA OU SUA APOSENTADORIA OU TRANSFERÊNCIA PARA A INATIVIDADE.
+
+## Requerimentos e demais atos de expediente (33)
+
+Agregados por assunto atribuido pela Casa, por serem numerosos e repetitivos.
+
+| Assunto | Quantidade |
+|---|---:|
+| SEGURANÇA PÚBLICA | 19 |
+| AUSÊNCIA / FALTA | 4 |
+| MOÇÃO DE APOIO | 2 |
+| MENÇÃO HONROSA | 2 |
+| ENVIO DE EXPEDIENTE | 2 |
+| ALEP | 1 |
+| INFORMAÇÃO | 1 |
+| ASSUNTO A DEFINIR | 1 |
+| COAUTORIA | 1 |
+
+
+---
+
+## Nota metodologica
+
+Dados extraidos do servico publico da Assembleia Legislativa do Parana
+(`webservices.assembleia.pr.leg.br/api/public`) e reorganizados por regras
+deterministicas, sem inferencia estatistica.
+
+Uma proposicao em coautoria e contabilizada para cada signatario. Por isso a
+soma das contagens individuais de todos os parlamentares excede o numero de
+proposicoes distintas protocoladas na Casa.
+
+Este arquivo descreve, nao qualifica. Nao contem nota, ranking nem juizo de
+desempenho: a leitura e a conclusao pertencem a quem consulta.

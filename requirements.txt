@@ -1,0 +1,8 @@
+# Dependencias do pipeline E.N.E.I.A.S.
+# Instalacao:  pip install -r requirements.txt
+#
+# Testado em Python 3.11.9 (Windows 10) em 22/08/2026.
+# Requer Python 3.6+ (f-strings) — recomendado 3.9+.
+
+requests>=2.31,<3
+urllib3>=2.0,<3
