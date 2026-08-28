@@ -2,9 +2,12 @@ import os
 import json
 import glob
 import re
+import hashlib
+from datetime import datetime
 
 # Configuração de Caminhos
-WORKSPACE_ROOT = r"c:\Users\Marcus Schneider\Documents\Marcus\2026\Projetos\Fase_final_Apresentação\ALEP"
+# Raiz do repositorio: este arquivo vive em <raiz>/execution/
+WORKSPACE_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 RAW_PROPS_DIR = os.path.join(WORKSPACE_ROOT, ".tmp", "raw_proposicoes")
 RAW_DETAILS_DIR = os.path.join(WORKSPACE_ROOT, ".tmp", "raw_detalhes")
 OUTPUT_FILE = os.path.join(WORKSPACE_ROOT, "DADOS_ALEP_20.js")
@@ -90,6 +93,67 @@ def carregar_detalhes():
     print(f"{len(detalhes)} detalhes processados.")
     return detalhes
 
+def _origem_do_universo():
+    """Data de fechamento do universo analisado.
+
+    Duas origens sao possiveis. Se as matrizes forem as do snapshot publicado,
+    a data e a do snapshot; se vierem de coleta propria, e a data do download.
+
+    A distincao e feita por conteudo, comparando o SHA-256 de cada matriz com
+    o registrado no manifesto. Datas de arquivo nao serviriam: restaurar o
+    snapshot reescreve os arquivos com o horario da restauracao, e a heuristica
+    apontaria hoje para um universo de marco.
+    """
+    arquivos = glob.glob(os.path.join(RAW_PROPS_DIR, "proposicoes_*_ws_raw.json"))
+    if not arquivos:
+        return "indeterminado"
+
+    for manifesto in glob.glob(os.path.join(WORKSPACE_ROOT, "dados", "snapshot_*", "MANIFEST.md")):
+        with open(manifesto, encoding="utf-8") as f:
+            esperado = dict(re.findall(r"\|\s*(\d{4})\s*\|.*?`([0-9a-f]{64})`", f.read()))
+        if not esperado:
+            continue
+        confere = True
+        for caminho in arquivos:
+            ano = os.path.basename(caminho).split("_")[1]
+            with open(caminho, "rb") as f:
+                sha = hashlib.sha256(f.read()).hexdigest()
+            if esperado.get(ano) != sha:
+                confere = False
+                break
+        if confere and len(arquivos) == len(esperado):
+            marca = os.path.basename(os.path.dirname(manifesto)).replace("snapshot_", "")
+            return "/".join(reversed(marca.split("-")))
+
+    from datetime import date
+    return date.fromtimestamp(max(os.path.getmtime(a) for a in arquivos)).strftime("%d/%m/%Y")
+
+
+def atualizar_referencia_html():
+    """Versiona a referencia ao payload no index.html pelo hash do conteudo.
+
+    Sem isso, o navegador reaproveita indefinidamente a copia em cache: o
+    pipeline roda, o arquivo muda no disco e o painel continua exibindo os
+    dados antigos. O hash muda junto com o dado e forca a nova busca.
+    """
+    html = os.path.join(WORKSPACE_ROOT, "index.html")
+    if not os.path.exists(html):
+        return
+
+    with open(OUTPUT_FILE, 'rb') as f:
+        versao = hashlib.sha256(f.read()).hexdigest()[:8]
+
+    with open(html, 'r', encoding='utf-8') as f:
+        conteudo = f.read()
+
+    novo = re.sub(r'src="DADOS_ALEP_20\.js(?:\?v=[0-9a-f]+)?"',
+                  'src="DADOS_ALEP_20.js?v=%s"' % versao, conteudo)
+    if novo != conteudo:
+        with open(html, 'w', encoding='utf-8') as f:
+            f.write(novo)
+        print(f"index.html: referencia do payload atualizada (v={versao})")
+
+
 def processar():
     detalhes_map = carregar_detalhes()
     deputados_data = {}
@@ -130,9 +194,23 @@ def processar():
                 
                 # Trâmites simplificados para a timeline do dash
                 tramites_raw = detalhe.get('tramites', []) or p.get('tramites', [])
+                # A API entrega tramites[].data / .local / .acoes[].descricao.
+                # As acoes sao uma lista aninhada; consolidamos em string legivel.
                 tramites_simplificados = [
-                    {"data": t.get('dataPublicacaoOrdemDia'), "local": t.get('orgao'), "acao": t.get('descricao')}
-                    for t in tramites_raw if t.get('dataPublicacaoOrdemDia')
+                    {
+                        "data": t.get('data'),
+                        "local": t.get('local'),
+                        "acao": " | ".join(
+                            dict.fromkeys(
+                                a.get('descricao') for a in (t.get('acoes') or [])
+                                if a.get('descricao')
+                            )
+                        # ~60% dos eventos nao trazem descricao de acao. Para esses,
+                        # data e local ja sao a informacao; o rotulo fica neutro.
+                        ) or (t.get('observacao') or "Movimentação")
+                    }
+                    for t in sorted(tramites_raw, key=lambda x: (x.get('data') or ''))
+                    if t.get('data')
                 ]
                 
                 # Rastrear co-autoria
@@ -161,31 +239,35 @@ def processar():
                         }
                     
                     if normas:
-                        deputados_data[autor_atual]["leis_count"] += 1
+                        deputados_data[autor_atual]["leis_count"] += len(normas)
                     
                     # ─── CONSTRUÇÃO DO REGISTRO DE LEI ───
                     leis_formatadas = []
                     for n in normas:
-                        desc = n.get('descricao')
-                        num_lei = n.get('numeroLei')
-                        ano_lei = n.get('anoLei')
-                        
-                        # Evitar "Lei None/None" e usar fallback inteligente
-                        if desc and str(desc).lower() not in ('null', 'none', ''):
-                            lei_desc = desc
-                        elif num_lei and ano_lei:
-                            lei_desc = f"Lei {num_lei}/{ano_lei}"
+                        num_lei = n.get('numero')
+                        ano_lei = n.get('ano')
+                        tipo_norma = n.get('descricaoTipoNormaLegal') or "Norma"
+
+                        if num_lei and ano_lei:
+                            lei_desc = f"{tipo_norma} {num_lei}/{ano_lei}"
                         elif num_lei:
-                            lei_desc = f"Lei N° {num_lei}"
+                            lei_desc = f"{tipo_norma} n {num_lei}"
                         else:
-                            # Usar dados da proposição original como fallback final
+                            # Fallback final: identifica pela proposicao de origem
                             lei_desc = f"Norma vinculada ao {p.get('tipoProposicao', 'Projeto')} {p.get('numero', '')}/{p.get('ano', '')}"
-                        
+
+                        # Situacao oficial vem da ultima movimentacao (ex.: "Sancionada")
+                        movs = n.get('movimentacoes') or []
+                        situacao = movs[-1].get('conclusao') if movs else None
+
                         leis_formatadas.append({
                             "desc": lei_desc,
-                            "data": n.get('dataPublicacao') or n.get('dataLei')
+                            "data": n.get('data') or n.get('dataPublicacao'),
+                            "ementa": n.get('ementa'),
+                            "situacao": situacao,
+                            "observacao": n.get('resumo')
                         })
-                    
+
                     # Padronizar campos para o dashboard
                     item_dash = {
                         "id": p.get('codigo'),
@@ -206,13 +288,49 @@ def processar():
 
     # Converter para lista final
     output_list = list(deputados_data.values())
-    
+
+    # ─── METADADOS DA EXTRACAO ───
+    # Gravados junto ao payload para que o painel informe, sem edicao manual,
+    # quando os dados foram compilados e ate onde eles alcancam. Quem rodar o
+    # pipeline passa a ver a propria data no rodape.
+    anos, datas_tramite, datas_norma = set(), [], []
+    for dep in output_list:
+        for p in dep["proposicoes_lista"]:
+            if p.get("ano"):
+                anos.add(int(p["ano"]))
+            for t in (p.get("tramites") or []):
+                if t.get("data"):
+                    datas_tramite.append(t["data"])
+            for lei in (p.get("leis") or []):
+                if lei.get("data"):
+                    datas_norma.append(lei["data"])
+
+    anos_ord = sorted(anos)
+    meta = {
+        "gerado_em": datetime.now().astimezone().isoformat(timespec="seconds"),
+        "ano_inicio": anos_ord[0] if anos_ord else None,
+        "ano_fim": anos_ord[-1] if anos_ord else None,
+        "evento_mais_recente": max(datas_tramite) if datas_tramite else None,
+        "norma_mais_recente": max(datas_norma) if datas_norma else None,
+        "proposicoes_brutas": stats["total"],
+        "deputados": len(output_list),
+        "vinculos": sum(d["proposicoes_count"] for d in output_list),
+        "leis": sum(d["leis_count"] for d in output_list),
+        "fonte": "webservices.assembleia.pr.leg.br/api/public",
+        "universo_fechado_em": _origem_do_universo(),
+    }
+
     # Salvar como JS
     with open(OUTPUT_FILE, 'w', encoding='utf-8') as f:
-        f.write("const DADOS = ")
-        json.dump(output_list, f, ensure_ascii=False, indent=2)
+        f.write("const META = ")
+        json.dump(meta, f, ensure_ascii=False)
+        f.write(";\nconst DADOS = ")
+        # Sem indent: o payload e consumido pelo navegador, nao lido por humanos.
+        json.dump(output_list, f, ensure_ascii=False, separators=(',', ':'))
         f.write(";")
-    
+
+    atualizar_referencia_html()
+
     print(f"\n{'='*60}")
     print(f"CONSOLIDAÇÃO FINALIZADA")
     print(f"{'='*60}")

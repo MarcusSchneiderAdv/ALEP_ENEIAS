@@ -1,10 +1,14 @@
 import requests
 import json
 import os
+import sys
 import time
 import urllib3
 
 urllib3.disable_warnings()
+# Raiz do repositorio: estes scripts vivem em <raiz>/execution/
+RAIZ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
 
 # ==============================================================================
 # SCRIPT ENEIAS - FASE ENE: EXTRAÇÃO DE PROPOSIÇÕES ABERTAS (ALEP WS)
@@ -23,12 +27,13 @@ HEADERS = {
 }
 
 ANOS_ALVO = [2023, 2024, 2025, 2026]
-PASTA_DESTINO = "../.tmp/raw_proposicoes"
+PASTA_DESTINO = os.path.join(RAIZ, ".tmp", "raw_proposicoes")
 
 def coletar_proposicoes():
     os.makedirs(PASTA_DESTINO, exist_ok=True)
     
     total_geral = 0
+    falhas = []
     for ano in ANOS_ALVO:
         print(f"[*] Iniciando extração do ano {ano}...")
         
@@ -58,14 +63,16 @@ def coletar_proposicoes():
                 total_geral += len(lista_proposicoes)
             else:
                 print(f"[!] Erro no ano {ano}: Código {r.status_code} - {r.text}")
+                falhas.append(ano)
                 
         except Exception as e:
             print(f"[!] Falha crítica de conexão no ano {ano}: {str(e)}")
+            falhas.append(ano)
             
         # Rate limit respeitoso para WS Governamental
         time.sleep(2)
         
-    print(f"\n[✔️] FINALIZADO! Total de Proposições Extraídas: {total_geral}")
+    print(f"\n[OK] FINALIZADO! Total de Proposições Extraídas: {total_geral}")
 
 if __name__ == "__main__":
     coletar_proposicoes()
