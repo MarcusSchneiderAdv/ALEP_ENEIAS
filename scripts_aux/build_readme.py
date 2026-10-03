@@ -82,8 +82,9 @@ que já baixou, de modo que pode ser interrompida e retomada sem perda.
 
 ### Ver sem instalar nada
 
-O painel está publicado como site e abre direto no navegador, sem baixar nem
-executar coisa alguma. A versão publicada omite o histórico de tramitação, para
+**Painel publicado: https://marcusschneideradv.github.io/ALEP_ENEIAS/**
+
+Abre direto no navegador, sem baixar nem executar coisa alguma. A versão publicada omite o histórico de tramitação, para
 caber na hospedagem; todo o restante está íntegro.
 
 Para quem quiser conferir os números sem rodar o pipeline, há ainda
