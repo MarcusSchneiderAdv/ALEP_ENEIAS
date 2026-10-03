@@ -17,6 +17,9 @@ ENV/
 # Data and Logs
 .tmp/
 *.log
+# Carga util completa, regeravel e pesada (~23 MB): fica fora do versionamento.
 DADOS_ALEP_20.js
+# A versao enxuta publicada no GitHub Pages precisa ser versionada.
+!docs/DADOS_ALEP_20.js
 Citações/
 review_temp.txt

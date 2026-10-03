@@ -71,6 +71,7 @@ def main():
 
     if so_perfis:
         rodar("execution/gerar_perfis.py", "GERACAO DE DOSSIES")
+        rodar("execution/gerar_site.py", "GERACAO DO SITE")
         final()
         return
 
@@ -122,12 +123,17 @@ def main():
                  "FASE 5: dossies para consulta com IA"):
         pendencias.append("geracao de dossies")
 
+    if not rodar("execution/gerar_site.py",
+                 "FASE 6: site publicavel em docs/"):
+        pendencias.append("geracao do site")
+
     final(pendencias)
 
 
 def final(pendencias=()):
     titulo("PRONTO")
     print("Painel .......: abra index.html no navegador")
+    print("Site .........: docs/, pronto para o GitHub Pages")
     print("Dossies ......: dados/perfis/")
     print("  _PANORAMA.md .... visao da Casa, para perguntas comparativas")
     print("  _CONSOLIDADO.csv  metricas de todos, para planilha")
