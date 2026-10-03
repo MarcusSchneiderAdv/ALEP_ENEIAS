@@ -80,9 +80,21 @@ coleta do zero isso leva cerca de **50 minutos**, com intervalos entre as
 requisições para não sobrecarregar os servidores do Estado. A rotina preserva o
 que já baixou, de modo que pode ser interrompida e retomada sem perda.
 
-### O que você recebe
+### Ver sem instalar nada
 
-**Um painel visual.** Abra `index.html` no navegador. Traz a produção por
+O painel está publicado como site e abre direto no navegador, sem baixar nem
+executar coisa alguma. A versão publicada omite o histórico de tramitação, para
+caber na hospedagem; todo o restante está íntegro.
+
+Para quem quiser conferir os números sem rodar o pipeline, há ainda
+[`dados/conferencia/CONFERENCIA.md`](dados/conferencia/CONFERENCIA.md), com a
+recontagem dos 63 parlamentares feita por rotina independente, e os dossiês em
+[`dados/perfis/`](dados/perfis/), que trazem o endereço da fonte oficial de cada
+proposição.
+
+### O que você recebe ao rodar
+
+**Um painel visual completo.** Abra `index.html` no navegador. Traz a produção por
 parlamentar, distribuição por espécie, conversão em norma e a linha do tempo de
 tramitação de cada proposição.
 

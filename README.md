@@ -59,9 +59,21 @@ coleta do zero isso leva cerca de **50 minutos**, com intervalos entre as
 requisições para não sobrecarregar os servidores do Estado. A rotina preserva o
 que já baixou, de modo que pode ser interrompida e retomada sem perda.
 
-### O que você recebe
+### Ver sem instalar nada
 
-**Um painel visual.** Abra `index.html` no navegador. Traz a produção por
+O painel está publicado como site e abre direto no navegador, sem baixar nem
+executar coisa alguma. A versão publicada omite o histórico de tramitação, para
+caber na hospedagem; todo o restante está íntegro.
+
+Para quem quiser conferir os números sem rodar o pipeline, há ainda
+[`dados/conferencia/CONFERENCIA.md`](dados/conferencia/CONFERENCIA.md), com a
+recontagem dos 63 parlamentares feita por rotina independente, e os dossiês em
+[`dados/perfis/`](dados/perfis/), que trazem o endereço da fonte oficial de cada
+proposição.
+
+### O que você recebe ao rodar
+
+**Um painel visual completo.** Abra `index.html` no navegador. Traz a produção por
 parlamentar, distribuição por espécie, conversão em norma e a linha do tempo de
 tramitação de cada proposição.
 
@@ -141,7 +153,9 @@ A abordagem é empírico-jurídica, quantitativa e descritiva, ancorada no dever
 
 O **fechamento do universo** ocorreu em 22 de março de 2026. É a data que define quais proposições integram o estudo, e a partir dela nenhuma proposição nova foi acrescentada. O objeto é uma legislatura em curso, e o Parlamento seguiu legislando: uma consulta de aferição em agosto de 2026 devolveu 17.239 proposições, contra as 15.369 do corte, sendo a diferença integralmente do exercício de 2026.
 
-A **observação do estado processual** ocorreu em 24 de agosto de 2026. Fixado o universo, o percurso de cada proposição dentro dele continua evoluindo, e essa segunda data registra até onde esse percurso foi acompanhado. O evento de tramitação mais recente é de 20 de agosto de 2026 e a norma mais recente é de 27 de julho de 2026.
+A **observação do estado processual** não é uniforme, e a imprecisão precisa ser declarada em vez de arredondada. Fixado o universo, o percurso de cada proposição dentro dele continua evoluindo, e essa segunda data registra até onde esse percurso foi acompanhado. O registro de detalhe de 14.340 proposições foi obtido em 21 de março de 2026, e o das 1.029 restantes, protocoladas no exercício de 2026 após aquela rotina, em 28 de agosto de 2026. O evento de tramitação mais recente contido no corpus é de 20 de agosto de 2026 e a norma mais recente é de 27 de julho de 2026.
+
+A heterogeneidade decorre da reentrância da rotina de enriquecimento, que preserva os registros já obtidos e busca apenas os ausentes. A propriedade protege os servidores do Estado contra recoleta desnecessária e, pelo mesmo mecanismo, impede a atualização do que já existe. O efeito é que as contagens de espécie, autoria e situação processual, que derivam da listagem, são homogêneas e estáveis, ao passo que as de tramitação e conversão normativa refletem observações de datas distintas e tendem a subestimar o estado atual. Uma reexecução integral da fase de enriquecimento uniformiza a observação, e consta do Apêndice A.
 
 A separação evita uma confusão comum em estudos legislativos. Um universo congelado com estado processual desatualizado subestima a conversão normativa, porque matérias sancionadas após a coleta aparecem como pendentes. Um universo aberto com estado atualizado impede a reprodução, porque a base muda a cada execução. A combinação adotada, universo fixo e estado observado em data declarada, preserva as duas propriedades.
 
@@ -635,8 +649,10 @@ SILVA, José Afonso da. A Lei. **Revista de Direito Administrativo**, Rio de Jan
 | `execution/` | **Camada 3.** Rotinas determinísticas de coleta e transformação. |
 | `dados/snapshot_2026-03-22/` | Universo congelado da pesquisa, com manifesto e SHA-256 por exercício. |
 | `dados/perfis/` | Dossiês por parlamentar, panorama da Casa e planilha consolidada. |
+| `dados/conferencia/` | Recontagem independente dos números publicados. |
+| `docs/` | Texto da pesquisa e site publicado, servido pelo GitHub Pages. |
 | `executar.py` | Ponto de entrada único do pipeline. |
-| `docs/monografia/` | Texto integral da pesquisa, fonte canônica do README. |
+
 | `scripts_aux/` | Montagem do README e restauração do snapshot. |
 | `GOVERNANCE.md` | Arquitetura em três camadas e vedações do projeto. |
 | `requirements.txt` | Dependências externas do pipeline. |
@@ -695,9 +711,13 @@ python execution/agrupar_dados_dashboard.py
 
 **Fase 2, enriquecimento.** Percorre os códigos coletados e recupera, para cada proposição, o histórico de tramitação e os vínculos normativos, com paralelismo controlado. Arquivos já presentes são preservados, o que torna a rotina reentrante. Ao final, ela informa quantos registros faltaram e sinaliza a pendência por código de saída.
 
+A reentrância tem contrapartida que o item 1.3 registra: registros já obtidos não são reconsultados, de modo que uma execução parcial deixa o corpus com datas de observação distintas. Para uniformizar, apaga-se o diretório `.tmp/raw_detalhes/` antes de executar a fase, o que força a reconsulta integral. A operação demanda cerca de cinquenta minutos e deve ser reservada aos momentos em que a homogeneidade da observação importe, como a consolidação de resultados para publicação.
+
 **Fase 3, normas legais.** Consolida a base de normas sancionadas no período, para referência cruzada.
 
 **Fase 4, consolidação.** Aplica a fragmentação de autoria, segrega iniciativas institucionais, classifica por espécie proposicional, grava os metadados de procedência e serializa a carga útil estática.
+
+**Fase 6, site publicável.** Monta em `docs/` a versão hospedada do painel, com carga útil reduzida pela omissão do histórico de tramitação, que responde por cerca de 62% do volume. A redução existe para que o artefato caiba em hospedagem estática gratuita e permaneça versionável sem inflar o repositório a cada regeração. O cidadão que apenas consulta não instala nada; quem precisa do histórico processual roda o pipeline ou abre o registro na fonte.
 
 **Fase 5, dossiês.** Converte a carga útil em arquivos de texto legíveis por pessoas e por modelos de linguagem, um por parlamentar, mais um panorama da Casa e uma planilha consolidada. Essa saída atende ao leitor que prefere perguntar a navegar: anexado a um assistente de IA, o dossiê permite consulta em linguagem natural sobre a atuação de cada parlamentar. Os arquivos contêm fatos registrais e nenhuma qualificação, de modo que qualquer juízo emitido na conversa é do assistente e de quem pergunta, não do sistema que organizou os dados. A distinção preserva, na ponta de consumo, a mesma fronteira que o capítulo 4 estabelece na arquitetura.
 
