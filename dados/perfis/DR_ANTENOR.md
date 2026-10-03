@@ -14,6 +14,28 @@ de `_PANORAMA.md`, no mesmo diretorio.
 | Normas sancionadas vinculadas | 13 |
 | Arquivadas | 190 |
 | Em tramitacao | 63 |
+| Homenagens (mencao, congratulacoes, louvor) | 18 |
+| Votos de pesar | 5 |
+
+Homenagem e pesar vem separados porque a Casa os classifica como assuntos
+distintos: voto de pesar registra falecimento, nao concede honraria.
+
+## Distribuicao por familia de assunto
+
+| Familia | Quantidade |
+|---|---:|
+| EXPEDIENTE E TRÂMITE | 106 |
+| POLÍTICA PÚBLICA | 39 |
+| SEM CLASSIFICAÇÃO NA ORIGEM | 31 |
+| AUSÊNCIA | 25 |
+| HOMENAGEM | 18 |
+| FISCALIZAÇÃO | 10 |
+| TÉCNICA LEGISLATIVA | 5 |
+| PESAR | 5 |
+| SERVIDOR PÚBLICO | 4 |
+| UTILIDADE PÚBLICA | 4 |
+| ORGANIZAÇÃO INTERNA | 4 |
+| TRIBUTO E ORÇAMENTO | 2 |
 
 ## Distribuicao por especie
 
@@ -159,35 +181,204 @@ individualmente com ementa.
 
 Agregados por assunto atribuido pela Casa, por serem numerosos e repetitivos.
 
-| Assunto | Quantidade |
+Primeiro por familia, depois pelo rotulo oficial dentro de cada uma.
+As familias constam de directives/familias_de_assunto.md, que declara a
+que grupo cada rotulo da Casa pertence. Nenhuma ementa foi interpretada.
+
+| Familia | Quantidade |
+|---|---:|
+| **EXPEDIENTE E TRÂMITE** | **106** |
+| **SEM CLASSIFICAÇÃO NA ORIGEM** | **29** |
+| **AUSÊNCIA** | **25** |
+| **HOMENAGEM** | **16** |
+| **POLÍTICA PÚBLICA** | **15** |
+| **FISCALIZAÇÃO** | **10** |
+| **PESAR** | **5** |
+| **ORGANIZAÇÃO INTERNA** | **4** |
+| **TÉCNICA LEGISLATIVA** | **3** |
+
+**EXPEDIENTE E TRÂMITE** (106)
+
+| Rotulo oficial | Quantidade |
 |---|---:|
 | EMENDAS | 72 |
-| ASSUNTO A DEFINIR | 29 |
 | ENVIO DE EXPEDIENTE | 25 |
-| AUSÊNCIA / FALTA | 25 |
-| MENÇÃO HONROSA | 10 |
-| PEDIDO DE INFORMAÇÃO | 7 |
-| VOTOS DE PESAR | 5 |
-| RODOVIAS | 4 |
 | COAUTORIA | 4 |
-| PEDÁGIO | 3 |
-| FRENTE PARLAMENTAR | 3 |
-| MOÇÃO DE APOIO | 3 |
-| COPEL/ENERGIA | 3 |
-| CONGRATULAÇÕES | 3 |
-| ALTERAÇÃO DE LEIS | 3 |
 | RETIRADA DE SESSÃO | 2 |
-| FISCALIZAÇÃO | 2 |
-| EDUCAÇÃO | 1 |
 | ANTECIPAÇÃO DE HORÁRIO DA SESSÃO PLENÁRIA | 1 |
-| ALEP | 1 |
-| DIREITOS HUMANOS | 1 |
-| CONVOCAÇÃO | 1 |
 | VOTAÇÃO | 1 |
+| ARQUIVAMENTO | 1 |
+
+**SEM CLASSIFICAÇÃO NA ORIGEM** (29)
+
+| Rotulo oficial | Quantidade |
+|---|---:|
+| ASSUNTO A DEFINIR | 29 |
+
+**AUSÊNCIA** (25)
+
+| Rotulo oficial | Quantidade |
+|---|---:|
+| AUSÊNCIA / FALTA | 25 |
+
+**HOMENAGEM** (16)
+
+| Rotulo oficial | Quantidade |
+|---|---:|
+| MENÇÃO HONROSA | 10 |
+| MOÇÃO DE APOIO | 3 |
+| CONGRATULAÇÕES | 3 |
+
+**POLÍTICA PÚBLICA** (15)
+
+| Rotulo oficial | Quantidade |
+|---|---:|
+| RODOVIAS | 4 |
+| PEDÁGIO | 3 |
+| COPEL/ENERGIA | 3 |
+| EDUCAÇÃO | 1 |
+| DIREITOS HUMANOS | 1 |
 | SEGURANÇA PÚBLICA | 1 |
 | TELECOMUNICAÇÕES | 1 |
 | ECOLOGIA E MEIO AMBIENTE | 1 |
-| ARQUIVAMENTO | 1 |
+
+**FISCALIZAÇÃO** (10)
+
+| Rotulo oficial | Quantidade |
+|---|---:|
+| PEDIDO DE INFORMAÇÃO | 7 |
+| FISCALIZAÇÃO | 2 |
+| CONVOCAÇÃO | 1 |
+
+**PESAR** (5)
+
+| Rotulo oficial | Quantidade |
+|---|---:|
+| VOTOS DE PESAR | 5 |
+
+**ORGANIZAÇÃO INTERNA** (4)
+
+| Rotulo oficial | Quantidade |
+|---|---:|
+| FRENTE PARLAMENTAR | 3 |
+| ALEP | 1 |
+
+**TÉCNICA LEGISLATIVA** (3)
+
+| Rotulo oficial | Quantidade |
+|---|---:|
+| ALTERAÇÃO DE LEIS | 3 |
+
+## Como conferir estes numeros na fonte
+
+Nao e preciso confiar neste arquivo. Cada proposicao tem um codigo no
+sistema da Assembleia, e o registro oficial de qualquer uma delas abre
+direto no navegador, sem instalar nada:
+
+    http://webservices.assembleia.pr.leg.br/api/public/proposicao/CODIGO
+
+A pagina devolve o registro bruto da Casa, com autor, ementa, situacao,
+historico de tramitacao e normas vinculadas. E a fonte primaria: o que
+aparece ali nao passou por este projeto.
+
+### Normas sancionadas, uma a uma
+
+Sao as afirmacoes de maior peso deste dossie. Confira cada uma:
+
+| Norma | Proposicao de origem | Conferir na fonte |
+|---|---|---|
+| Lei 23295/2026 | PROJETO DE LEI 172/2026 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/128389 |
+| Lei 22996/2026 | PROJETO DE LEI 136/2024 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/117229 |
+| Lei 22848/2025 | PROJETO DE LEI 423/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/123448 |
+| Lei 22501/2025 | PROJETO DE LEI 270/2024 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/118109 |
+| Lei 22383/2025 | PROJETO DE LEI 637/2024 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/120333 |
+| Lei 22312/2025 | PROJETO DE LEI 142/2024 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/117336 |
+| Lei 22245/2024 | PROJETO DE LEI 292/2024 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/118284 |
+| Lei 22130/2024 | PROJETO DE LEI 1055/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/116449 |
+| Lei 22076/2024 | PROJETO DE LEI 13/2024 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/116585 |
+| Lei 21964/2024 | PROJETO DE LEI 710/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/114335 |
+| Lei 21956/2024 | PROJETO DE LEI 651/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/114112 |
+| Lei 21940/2024 | PROJETO DE LEI 619/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/113934 |
+| Lei 21812/2023 | PROJETO DE LEI 733/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/114481 |
+
+Ao abrir, procure o trecho `normasLegais`. Ele traz o numero da lei, a
+data e a situacao. Se o que esta la divergir do que este arquivo
+afirma, o erro e deste arquivo.
+
+### Proposicoes normativas
+
+| Proposicao | Conferir na fonte |
+|---|---|
+| PROJETO DE LEI 167/2026 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/128353 |
+| PROJETO DE LEI 172/2026 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/128389 |
+| PROJETO DE LEI 183/2026 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/128379 |
+| PROJETO DE RESOLUÇÃO 10/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/124349 |
+| PROJETO DECRETO LEGISLATIVO 12/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/125122 |
+| PROJETO DE LEI 145/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/122069 |
+| PROJETO DE LEI 189/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/122322 |
+| PROJETO DE LEI 423/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/123448 |
+| PROJETO DE LEI 424/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/123653 |
+| PROJETO DE LEI 486/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/123948 |
+| PROJETO DE LEI 805/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/125494 |
+| PROJETO DE LEI 957/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/126039 |
+| PROJETO DE LEI 1042/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/126521 |
+| PROJETO DE LEI 1256/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/126992 |
+| PROJETO DE LEI 13/2024 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/116585 |
+| PROJETO DE LEI 136/2024 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/117229 |
+| PROJETO DE LEI 142/2024 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/117336 |
+| PROJETO DE LEI 270/2024 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/118109 |
+| PROJETO DE LEI 292/2024 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/118284 |
+| PROJETO DE LEI 326/2024 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/118392 |
+| PROJETO DE LEI 489/2024 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/119409 |
+| PROJETO DE LEI 637/2024 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/120333 |
+| PROJETO DE LEI 784/2024 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/121201 |
+| PROPOSTA DE EMENDA À CONSTITUIÇÃO 1/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/112530 |
+| PROPOSTA DE EMENDA À CONSTITUIÇÃO 2/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/113268 |
+| PROJETO DE LEI 316/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/112375 |
+| PROJETO DE LEI 619/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/113934 |
+| PROJETO DE LEI 651/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/114112 |
+| PROJETO DE LEI 660/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/114108 |
+| PROJETO DE LEI 710/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/114335 |
+| PROJETO DE LEI 733/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/114481 |
+| PROJETO DE LEI 736/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/114519 |
+| PROJETO DE LEI 756/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/114595 |
+| PROJETO DE LEI 770/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/114691 |
+| PROJETO DE LEI 787/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/114848 |
+| PROJETO DE LEI 799/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/114847 |
+| PROJETO DE LEI 833/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/115091 |
+| PROJETO DE LEI 902/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/115414 |
+| PROJETO DE LEI 955/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/115625 |
+| PROJETO DE LEI 1055/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/116449 |
+
+### Conferindo com ajuda de uma IA
+
+Se preferir nao ler o registro bruto, que vem em formato tecnico:
+
+1. Abra um dos enderecos acima no navegador.
+2. Selecione tudo (Ctrl+A), copie (Ctrl+C).
+3. Cole num assistente de IA junto com este dossie e peca:
+   *"Confira se o que o dossie afirma sobre esta proposicao bate com o
+   registro oficial que colei. Aponte qualquer divergencia."*
+
+A IA le o formato tecnico por voce. A conferencia continua sendo contra
+a fonte, porque o texto colado veio da Assembleia, nao deste projeto.
+
+### Conferindo os totais
+
+Os totais deste dossie, como "253 proposicoes", nao se conferem por um
+endereco so: exigem somar o conjunto inteiro. Dois caminhos:
+
+- `dados/conferencia/CONFERENCIA.md`, no repositorio, traz a recontagem
+  de todos os parlamentares feita por rotina independente do pipeline.
+- Quem tiver Python instalado roda a conferencia por conta propria:
+  `python scripts_aux/conferir_parlamentar.py "DR. ANTENOR"`
+
+### Uma ressalva sobre o site da Assembleia
+
+As paginas de perfil dos deputados em assembleia.pr.leg.br estao com
+exibicao suspensa durante o periodo eleitoral, por forca do art. 73 da
+Lei nº 9.504/1997. Os enderecos de dados indicados acima seguem no ar,
+porque sao servico de dados abertos, nao publicidade institucional.
 
 
 ---

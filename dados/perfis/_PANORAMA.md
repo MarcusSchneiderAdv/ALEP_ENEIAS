@@ -6,7 +6,7 @@ use o dossie individual correspondente.
 | Contexto | Valor |
 |---|---|
 | Universo fechado em | 22/03/2026 |
-| Estado processual observado em | 28/08/2026 |
+| Estado processual observado em | 02/10/2026 |
 | Proposicoes protocoladas | 15.369 |
 | Vinculos autor-proposicao | 22.128 |
 | Parlamentares | 63 |

@@ -73,6 +73,9 @@ def metricas(dep):
         "arquivadas": sum(1 for p in props if (p.get("status") or "").upper() == "ARQUIVADA"),
         "tramitando": sum(1 for p in props if (p.get("status") or "").upper() == "TRAMITANDO"),
         "tipos": tipos,
+        "homenagens": sum(1 for p in props if p.get("familia") == "HOMENAGEM"),
+        "pesar": sum(1 for p in props if p.get("familia") == "PESAR"),
+        "familias": Counter(p.get("familia") or "NAO CLASSIFICADO" for p in props),
     }
 
 
@@ -124,6 +127,18 @@ def escrever_dossie(dep, meta):
     A("| Normas sancionadas vinculadas | %d |" % m["leis"])
     A("| Arquivadas | %d |" % m["arquivadas"])
     A("| Em tramitacao | %d |" % m["tramitando"])
+    A("| Homenagens (mencao, congratulacoes, louvor) | %d |" % m["homenagens"])
+    A("| Votos de pesar | %d |" % m["pesar"])
+    A("")
+    A("Homenagem e pesar vem separados porque a Casa os classifica como assuntos")
+    A("distintos: voto de pesar registra falecimento, nao concede honraria.")
+    A("")
+    A("## Distribuicao por familia de assunto")
+    A("")
+    A("| Familia | Quantidade |")
+    A("|---|---:|")
+    for fam, c in m["familias"].most_common():
+        A("| %s | %d |" % (fam, c))
     A("")
 
     A("## Distribuicao por especie")
@@ -177,11 +192,99 @@ def escrever_dossie(dep, meta):
         A("")
         A("Agregados por assunto atribuido pela Casa, por serem numerosos e repetitivos.")
         A("")
-        A("| Assunto | Quantidade |")
-        A("|---|---:|")
-        for t, c in Counter((p.get("tema") or "NAO INFORMADO") for p in outras).most_common():
-            A("| %s | %d |" % (t, c))
+        A("Primeiro por familia, depois pelo rotulo oficial dentro de cada uma.")
+        A("As familias constam de directives/familias_de_assunto.md, que declara a")
+        A("que grupo cada rotulo da Casa pertence. Nenhuma ementa foi interpretada.")
         A("")
+        porfam = {}
+        for q in outras:
+            fam = q.get("familia") or "NAO CLASSIFICADO"
+            porfam.setdefault(fam, Counter())[q.get("tema") or "SEM ASSUNTO"] += 1
+        A("| Familia | Quantidade |")
+        A("|---|---:|")
+        for fam, rot in sorted(porfam.items(), key=lambda kv: -sum(kv[1].values())):
+            A("| **%s** | **%d** |" % (fam, sum(rot.values())))
+        A("")
+        for fam, rot in sorted(porfam.items(), key=lambda kv: -sum(kv[1].values())):
+            A("**%s** (%d)" % (fam, sum(rot.values())))
+            A("")
+            A("| Rotulo oficial | Quantidade |")
+            A("|---|---:|")
+            for t, c in rot.most_common():
+                A("| %s | %d |" % (t, c))
+            A("")
+
+    # ─── Conferencia na fonte ───
+    A("## Como conferir estes numeros na fonte")
+    A("")
+    A("Nao e preciso confiar neste arquivo. Cada proposicao tem um codigo no")
+    A("sistema da Assembleia, e o registro oficial de qualquer uma delas abre")
+    A("direto no navegador, sem instalar nada:")
+    A("")
+    A("    http://webservices.assembleia.pr.leg.br/api/public/proposicao/CODIGO")
+    A("")
+    A("A pagina devolve o registro bruto da Casa, com autor, ementa, situacao,")
+    A("historico de tramitacao e normas vinculadas. E a fonte primaria: o que")
+    A("aparece ali nao passou por este projeto.")
+    A("")
+
+    if leis:
+        A("### Normas sancionadas, uma a uma")
+        A("")
+        A("Sao as afirmacoes de maior peso deste dossie. Confira cada uma:")
+        A("")
+        A("| Norma | Proposicao de origem | Conferir na fonte |")
+        A("|---|---|---|")
+        for lei, p in sorted(leis, key=lambda x: str(x[0].get("data") or ""), reverse=True):
+            A("| %s | %s %s/%s | http://webservices.assembleia.pr.leg.br/api/public/proposicao/%s |"
+              % (lei.get("desc"), p.get("tipo"), p.get("numero"), p.get("ano"), p.get("id")))
+        A("")
+        A("Ao abrir, procure o trecho `normasLegais`. Ele traz o numero da lei, a")
+        A("data e a situacao. Se o que esta la divergir do que este arquivo")
+        A("afirma, o erro e deste arquivo.")
+        A("")
+
+    if normativas:
+        A("### Proposicoes normativas")
+        A("")
+        A("| Proposicao | Conferir na fonte |")
+        A("|---|---|")
+        for p in sorted(normativas, key=lambda x: (-(x.get("ano") or 0), x.get("numero") or 0)):
+            A("| %s %s/%s | http://webservices.assembleia.pr.leg.br/api/public/proposicao/%s |"
+              % (p.get("tipo"), p.get("numero"), p.get("ano"), p.get("id")))
+        A("")
+
+    A("### Conferindo com ajuda de uma IA")
+    A("")
+    A("Se preferir nao ler o registro bruto, que vem em formato tecnico:")
+    A("")
+    A("1. Abra um dos enderecos acima no navegador.")
+    A("2. Selecione tudo (Ctrl+A), copie (Ctrl+C).")
+    A("3. Cole num assistente de IA junto com este dossie e peca:")
+    A("   *\"Confira se o que o dossie afirma sobre esta proposicao bate com o")
+    A("   registro oficial que colei. Aponte qualquer divergencia.\"*")
+    A("")
+    A("A IA le o formato tecnico por voce. A conferencia continua sendo contra")
+    A("a fonte, porque o texto colado veio da Assembleia, nao deste projeto.")
+    A("")
+
+    A("### Conferindo os totais")
+    A("")
+    A("Os totais deste dossie, como \"%d proposicoes\", nao se conferem por um" % m["proposicoes"])
+    A("endereco so: exigem somar o conjunto inteiro. Dois caminhos:")
+    A("")
+    A("- `dados/conferencia/CONFERENCIA.md`, no repositorio, traz a recontagem")
+    A("  de todos os parlamentares feita por rotina independente do pipeline.")
+    A("- Quem tiver Python instalado roda a conferencia por conta propria:")
+    A("  `python scripts_aux/conferir_parlamentar.py \"%s\"`" % m["nome"])
+    A("")
+    A("### Uma ressalva sobre o site da Assembleia")
+    A("")
+    A("As paginas de perfil dos deputados em assembleia.pr.leg.br estao com")
+    A("exibicao suspensa durante o periodo eleitoral, por forca do art. 73 da")
+    A("Lei nº 9.504/1997. Os enderecos de dados indicados acima seguem no ar,")
+    A("porque sao servico de dados abertos, nao publicidade institucional.")
+    A("")
 
     A(CABECALHO_METODO)
     return "\n".join(L)

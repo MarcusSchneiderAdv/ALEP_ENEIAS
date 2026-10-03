@@ -14,6 +14,25 @@ de `_PANORAMA.md`, no mesmo diretorio.
 | Normas sancionadas vinculadas | 3 |
 | Arquivadas | 47 |
 | Em tramitacao | 36 |
+| Homenagens (mencao, congratulacoes, louvor) | 35 |
+| Votos de pesar | 2 |
+
+Homenagem e pesar vem separados porque a Casa os classifica como assuntos
+distintos: voto de pesar registra falecimento, nao concede honraria.
+
+## Distribuicao por familia de assunto
+
+| Familia | Quantidade |
+|---|---:|
+| HOMENAGEM | 35 |
+| POLÍTICA PÚBLICA | 15 |
+| EXPEDIENTE E TRÂMITE | 11 |
+| AUSÊNCIA | 9 |
+| UTILIDADE PÚBLICA | 6 |
+| PESAR | 2 |
+| TÉCNICA LEGISLATIVA | 2 |
+| ORGANIZAÇÃO INTERNA | 2 |
+| FISCALIZAÇÃO | 1 |
 
 ## Distribuicao por especie
 
@@ -96,24 +115,162 @@ individualmente com ementa.
 
 Agregados por assunto atribuido pela Casa, por serem numerosos e repetitivos.
 
-| Assunto | Quantidade |
+Primeiro por familia, depois pelo rotulo oficial dentro de cada uma.
+As familias constam de directives/familias_de_assunto.md, que declara a
+que grupo cada rotulo da Casa pertence. Nenhuma ementa foi interpretada.
+
+| Familia | Quantidade |
+|---|---:|
+| **HOMENAGEM** | **29** |
+| **EXPEDIENTE E TRÂMITE** | **11** |
+| **AUSÊNCIA** | **9** |
+| **POLÍTICA PÚBLICA** | **3** |
+| **PESAR** | **2** |
+| **ORGANIZAÇÃO INTERNA** | **2** |
+| **TÉCNICA LEGISLATIVA** | **1** |
+| **FISCALIZAÇÃO** | **1** |
+
+**HOMENAGEM** (29)
+
+| Rotulo oficial | Quantidade |
 |---|---:|
 | VOTOS DE LOUVOR | 17 |
-| AUSÊNCIA / FALTA | 9 |
-| ENVIO DE EXPEDIENTE | 6 |
 | MOÇÃO DE APOIO | 5 |
 | MENÇÃO HONROSA | 5 |
-| COAUTORIA | 3 |
-| VOTOS DE PESAR | 2 |
 | CONGRATULAÇÕES | 2 |
-| FRENTE PARLAMENTAR | 2 |
+
+**EXPEDIENTE E TRÂMITE** (11)
+
+| Rotulo oficial | Quantidade |
+|---|---:|
+| ENVIO DE EXPEDIENTE | 6 |
+| COAUTORIA | 3 |
+| DELIBERAÇÃO | 1 |
+| EMENDAS | 1 |
+
+**AUSÊNCIA** (9)
+
+| Rotulo oficial | Quantidade |
+|---|---:|
+| AUSÊNCIA / FALTA | 9 |
+
+**POLÍTICA PÚBLICA** (3)
+
+| Rotulo oficial | Quantidade |
+|---|---:|
 | SANEPAR / RECURSOS HIDRICOS | 1 |
 | SEGURANÇA PÚBLICA | 1 |
-| CONSTITUIÇÃO | 1 |
-| DELIBERAÇÃO | 1 |
-| INFORMAÇÃO | 1 |
-| EMENDAS | 1 |
 | RODOVIAS | 1 |
+
+**PESAR** (2)
+
+| Rotulo oficial | Quantidade |
+|---|---:|
+| VOTOS DE PESAR | 2 |
+
+**ORGANIZAÇÃO INTERNA** (2)
+
+| Rotulo oficial | Quantidade |
+|---|---:|
+| FRENTE PARLAMENTAR | 2 |
+
+**TÉCNICA LEGISLATIVA** (1)
+
+| Rotulo oficial | Quantidade |
+|---|---:|
+| CONSTITUIÇÃO | 1 |
+
+**FISCALIZAÇÃO** (1)
+
+| Rotulo oficial | Quantidade |
+|---|---:|
+| INFORMAÇÃO | 1 |
+
+## Como conferir estes numeros na fonte
+
+Nao e preciso confiar neste arquivo. Cada proposicao tem um codigo no
+sistema da Assembleia, e o registro oficial de qualquer uma delas abre
+direto no navegador, sem instalar nada:
+
+    http://webservices.assembleia.pr.leg.br/api/public/proposicao/CODIGO
+
+A pagina devolve o registro bruto da Casa, com autor, ementa, situacao,
+historico de tramitacao e normas vinculadas. E a fonte primaria: o que
+aparece ali nao passou por este projeto.
+
+### Normas sancionadas, uma a uma
+
+Sao as afirmacoes de maior peso deste dossie. Confira cada uma:
+
+| Norma | Proposicao de origem | Conferir na fonte |
+|---|---|---|
+| Lei 22701/2025 | PROJETO DE LEI 383/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/123350 |
+| Lei 22449/2025 | PROJETO DE LEI 50/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/121540 |
+| Lei 22433/2025 | PROJETO DE LEI 66/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/121630 |
+
+Ao abrir, procure o trecho `normasLegais`. Ele traz o numero da lei, a
+data e a situacao. Se o que esta la divergir do que este arquivo
+afirma, o erro e deste arquivo.
+
+### Proposicoes normativas
+
+| Proposicao | Conferir na fonte |
+|---|---|
+| PROJETO DE LEI 136/2026 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/128214 |
+| PROJETO DE LEI 200/2026 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/128522 |
+| PROJETO DE LEI 223/2026 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/128631 |
+| PROPOSTA DE EMENDA À CONSTITUIÇÃO 2/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/123352 |
+| PROJETO DE LEI 50/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/121540 |
+| PROJETO DE LEI 66/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/121630 |
+| PROJETO DE LEI 140/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/122035 |
+| PROJETO DE LEI 176/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/122194 |
+| PROJETO DE LEI 185/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/122302 |
+| PROJETO DE LEI 262/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/122770 |
+| PROJETO DE LEI 267/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/122852 |
+| PROJETO DE LEI 333/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/123092 |
+| PROJETO DE LEI 360/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/123291 |
+| PROJETO DE LEI 372/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/123367 |
+| PROJETO DE LEI 383/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/123350 |
+| PROJETO DE LEI 430/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/123647 |
+| PROJETO DE LEI 686/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/124927 |
+| PROJETO DE LEI 721/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/125093 |
+| PROJETO DE LEI 1184/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/127283 |
+| PROJETO DE LEI 1193/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/127349 |
+| PROJETO DE LEI 1244/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/127581 |
+| PROJETO DE LEI 1247/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/127589 |
+| PROJETO DE LEI 1248/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/127645 |
+| PROJETO DE LEI 561/2024 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/119949 |
+| PROJETO DE LEI 87/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/111451 |
+
+### Conferindo com ajuda de uma IA
+
+Se preferir nao ler o registro bruto, que vem em formato tecnico:
+
+1. Abra um dos enderecos acima no navegador.
+2. Selecione tudo (Ctrl+A), copie (Ctrl+C).
+3. Cole num assistente de IA junto com este dossie e peca:
+   *"Confira se o que o dossie afirma sobre esta proposicao bate com o
+   registro oficial que colei. Aponte qualquer divergencia."*
+
+A IA le o formato tecnico por voce. A conferencia continua sendo contra
+a fonte, porque o texto colado veio da Assembleia, nao deste projeto.
+
+### Conferindo os totais
+
+Os totais deste dossie, como "83 proposicoes", nao se conferem por um
+endereco so: exigem somar o conjunto inteiro. Dois caminhos:
+
+- `dados/conferencia/CONFERENCIA.md`, no repositorio, traz a recontagem
+  de todos os parlamentares feita por rotina independente do pipeline.
+- Quem tiver Python instalado roda a conferencia por conta propria:
+  `python scripts_aux/conferir_parlamentar.py "JAIRO TAMURA"`
+
+### Uma ressalva sobre o site da Assembleia
+
+As paginas de perfil dos deputados em assembleia.pr.leg.br estao com
+exibicao suspensa durante o periodo eleitoral, por forca do art. 73 da
+Lei nº 9.504/1997. Os enderecos de dados indicados acima seguem no ar,
+porque sao servico de dados abertos, nao publicidade institucional.
 
 
 ---

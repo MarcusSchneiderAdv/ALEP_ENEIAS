@@ -14,6 +14,27 @@ de `_PANORAMA.md`, no mesmo diretorio.
 | Normas sancionadas vinculadas | 29 |
 | Arquivadas | 280 |
 | Em tramitacao | 62 |
+| Homenagens (mencao, congratulacoes, louvor) | 111 |
+| Votos de pesar | 53 |
+
+Homenagem e pesar vem separados porque a Casa os classifica como assuntos
+distintos: voto de pesar registra falecimento, nao concede honraria.
+
+## Distribuicao por familia de assunto
+
+| Familia | Quantidade |
+|---|---:|
+| HOMENAGEM | 111 |
+| EXPEDIENTE E TRÂMITE | 90 |
+| PESAR | 53 |
+| POLÍTICA PÚBLICA | 43 |
+| UTILIDADE PÚBLICA | 18 |
+| ORGANIZAÇÃO INTERNA | 9 |
+| AUSÊNCIA | 9 |
+| TÉCNICA LEGISLATIVA | 4 |
+| FISCALIZAÇÃO | 3 |
+| TRIBUTO E ORÇAMENTO | 1 |
+| SEM CLASSIFICAÇÃO NA ORIGEM | 1 |
 
 ## Distribuicao por especie
 
@@ -237,39 +258,233 @@ individualmente com ementa.
 
 Agregados por assunto atribuido pela Casa, por serem numerosos e repetitivos.
 
-| Assunto | Quantidade |
+Primeiro por familia, depois pelo rotulo oficial dentro de cada uma.
+As familias constam de directives/familias_de_assunto.md, que declara a
+que grupo cada rotulo da Casa pertence. Nenhuma ementa foi interpretada.
+
+| Familia | Quantidade |
+|---|---:|
+| **HOMENAGEM** | **106** |
+| **EXPEDIENTE E TRÂMITE** | **90** |
+| **PESAR** | **53** |
+| **POLÍTICA PÚBLICA** | **18** |
+| **ORGANIZAÇÃO INTERNA** | **9** |
+| **AUSÊNCIA** | **9** |
+| **SEM CLASSIFICAÇÃO NA ORIGEM** | **1** |
+| **FISCALIZAÇÃO** | **1** |
+
+**HOMENAGEM** (106)
+
+| Rotulo oficial | Quantidade |
 |---|---:|
 | MENÇÃO HONROSA | 57 |
-| VOTOS DE PESAR | 53 |
-| EMENDAS | 46 |
 | VOTOS DE LOUVOR | 36 |
-| ENVIO DE EXPEDIENTE | 25 |
-| COAUTORIA | 11 |
-| AUSÊNCIA / FALTA | 9 |
-| FRENTE PARLAMENTAR | 7 |
 | MOÇÃO DE APOIO | 6 |
 | CONGRATULAÇÕES | 5 |
-| SEGURANÇA PÚBLICA | 4 |
+| MOÇÃO DE APLAUSO | 2 |
+
+**EXPEDIENTE E TRÂMITE** (90)
+
+| Rotulo oficial | Quantidade |
+|---|---:|
+| EMENDAS | 46 |
+| ENVIO DE EXPEDIENTE | 25 |
+| COAUTORIA | 11 |
 | ARQUIVAMENTO | 3 |
-| ALIMENTAÇÃO | 3 |
 | ARQUIVAMENTO / DESARQUIVAMENTO DE PROPOSIÇÕES | 2 |
+| INCLUSÃO/EXCLUSÃO | 1 |
+| ENCAMINHAMENTO DE DOCUMENTOS | 1 |
+| VOTAÇÃO | 1 |
+
+**PESAR** (53)
+
+| Rotulo oficial | Quantidade |
+|---|---:|
+| VOTOS DE PESAR | 53 |
+
+**POLÍTICA PÚBLICA** (18)
+
+| Rotulo oficial | Quantidade |
+|---|---:|
+| SEGURANÇA PÚBLICA | 4 |
+| ALIMENTAÇÃO | 3 |
 | DETRAN / TRÂNSITO | 2 |
 | SERVIÇOS PÚBLICOS | 2 |
-| MOÇÃO DE APLAUSO | 2 |
 | COPEL/ENERGIA | 1 |
 | CULTURA | 1 |
-| INCLUSÃO/EXCLUSÃO | 1 |
-| ASSUNTO A DEFINIR | 1 |
-| ALEP | 1 |
 | BANCOS | 1 |
-| INFORMAÇÃO | 1 |
 | OBRA PÚBLICA | 1 |
-| ENCAMINHAMENTO DE DOCUMENTOS | 1 |
-| RESERVA GRANDE EXPEDIENTE | 1 |
-| VOTAÇÃO | 1 |
 | EDUCAÇÃO | 1 |
 | DEFESA DO CONSUMIDOR | 1 |
 | RODOVIAS | 1 |
+
+**ORGANIZAÇÃO INTERNA** (9)
+
+| Rotulo oficial | Quantidade |
+|---|---:|
+| FRENTE PARLAMENTAR | 7 |
+| ALEP | 1 |
+| RESERVA GRANDE EXPEDIENTE | 1 |
+
+**AUSÊNCIA** (9)
+
+| Rotulo oficial | Quantidade |
+|---|---:|
+| AUSÊNCIA / FALTA | 9 |
+
+**SEM CLASSIFICAÇÃO NA ORIGEM** (1)
+
+| Rotulo oficial | Quantidade |
+|---|---:|
+| ASSUNTO A DEFINIR | 1 |
+
+**FISCALIZAÇÃO** (1)
+
+| Rotulo oficial | Quantidade |
+|---|---:|
+| INFORMAÇÃO | 1 |
+
+## Como conferir estes numeros na fonte
+
+Nao e preciso confiar neste arquivo. Cada proposicao tem um codigo no
+sistema da Assembleia, e o registro oficial de qualquer uma delas abre
+direto no navegador, sem instalar nada:
+
+    http://webservices.assembleia.pr.leg.br/api/public/proposicao/CODIGO
+
+A pagina devolve o registro bruto da Casa, com autor, ementa, situacao,
+historico de tramitacao e normas vinculadas. E a fonte primaria: o que
+aparece ali nao passou por este projeto.
+
+### Normas sancionadas, uma a uma
+
+Sao as afirmacoes de maior peso deste dossie. Confira cada uma:
+
+| Norma | Proposicao de origem | Conferir na fonte |
+|---|---|---|
+| Lei 23183/2026 | PROJETO DE LEI 168/2026 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/128360 |
+| Lei 23110/2026 | PROJETO DE LEI 157/2026 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/128306 |
+| Lei 23082/2026 | PROJETO DE LEI 90/2026 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/128017 |
+| Lei 23002/2026 | PROJETO DE LEI 1021/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/126474 |
+| Lei 22995/2026 | PROJETO DE LEI 1037/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/126500 |
+| Lei 22893/2025 | PROJETO DE LEI 840/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/125633 |
+| Lei 22814/2025 | PROJETO DE LEI 587/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/124256 |
+| Lei 22815/2025 | PROJETO DE LEI 846/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/125649 |
+| Lei 22781/2025 | PROJETO DE LEI 444/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/123791 |
+| Lei 22765/2025 | PROJETO DE LEI 888/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/115361 |
+| Lei 22701/2025 | PROJETO DE LEI 383/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/123350 |
+| Lei 22557/2025 | PROJETO DE LEI 296/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/122952 |
+| Lei 22517/2025 | PROJETO DE LEI 399/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/123519 |
+| Lei 22497/2025 | PROJETO DE LEI 365/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/123342 |
+| Lei 22479/2025 | PROJETO DE LEI 125/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/111597 |
+| Lei 22472/2025 | PROJETO DE LEI 295/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/122947 |
+| Lei 22437/2025 | PROJETO DE LEI 91/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/121749 |
+| Lei 22373/2025 | PROJETO DE LEI 106/2024 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/117059 |
+| Lei 22292/2025 | PROJETO DE LEI 515/2024 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/119608 |
+| Lei 22155/2024 | PROJETO DE LEI 513/2024 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/119568 |
+| Lei 22152/2024 | PROJETO DE LEI 413/2024 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/119053 |
+| Lei 22130/2024 | PROJETO DE LEI 1055/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/116449 |
+| Lei 22002/2024 | PROJETO DE LEI 769/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/114759 |
+| Lei 21987/2024 | PROJETO DE LEI 1009/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/115736 |
+| Lei 21966/2024 | PROJETO DE LEI 131/2024 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/117132 |
+| Lei 21964/2024 | PROJETO DE LEI 710/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/114335 |
+| Lei 21926/2024 | PROJETO DE LEI 625/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/113995 |
+| Lei 21916/2024 | PROJETO DE LEI 621/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/113942 |
+| Lei 21919/2024 | PROJETO DE LEI 14/2024 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/116589 |
+
+Ao abrir, procure o trecho `normasLegais`. Ele traz o numero da lei, a
+data e a situacao. Se o que esta la divergir do que este arquivo
+afirma, o erro e deste arquivo.
+
+### Proposicoes normativas
+
+| Proposicao | Conferir na fonte |
+|---|---|
+| PROJETO DE LEI 44/2026 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/127901 |
+| PROJETO DE LEI 45/2026 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/127902 |
+| PROJETO DE LEI 55/2026 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/127929 |
+| PROJETO DE LEI 90/2026 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/128017 |
+| PROJETO DE LEI 157/2026 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/128306 |
+| PROJETO DE LEI 168/2026 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/128360 |
+| PROJETO DE LEI 5/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/121377 |
+| PROJETO DE LEI 13/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/121411 |
+| PROJETO DE LEI 91/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/121749 |
+| PROJETO DE LEI 99/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/121756 |
+| PROJETO DE LEI 202/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/122413 |
+| PROJETO DE LEI 295/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/122947 |
+| PROJETO DE LEI 296/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/122952 |
+| PROJETO DE LEI 365/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/123342 |
+| PROJETO DE LEI 383/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/123350 |
+| PROJETO DE LEI 399/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/123519 |
+| PROJETO DE LEI 444/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/123791 |
+| PROJETO DE LEI 587/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/124256 |
+| PROJETO DE LEI 624/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/124511 |
+| PROJETO DE LEI 786/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/125377 |
+| PROJETO DE LEI 797/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/125452 |
+| PROJETO DE LEI 815/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/125518 |
+| PROJETO DE LEI 840/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/125633 |
+| PROJETO DE LEI 846/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/125649 |
+| PROJETO DE LEI 896/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/125828 |
+| PROJETO DE LEI 897/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/125829 |
+| PROJETO DE LEI 1021/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/126474 |
+| PROJETO DE LEI 1037/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/126500 |
+| PROJETO DE LEI 1212/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/127495 |
+| PROJETO DE LEI 1214/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/127481 |
+| PROJETO DE RESOLUÇÃO 2/2024 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/118823 |
+| PROJETO DE LEI 14/2024 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/116589 |
+| PROJETO DE LEI 106/2024 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/117059 |
+| PROJETO DE LEI 131/2024 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/117132 |
+| PROJETO DE LEI 400/2024 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/118995 |
+| PROJETO DE LEI 413/2024 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/119053 |
+| PROJETO DE LEI 513/2024 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/119568 |
+| PROJETO DE LEI 515/2024 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/119608 |
+| PROJETO DE LEI 567/2024 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/119978 |
+| PROJETO DE LEI 573/2024 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/119998 |
+| PROJETO DE LEI 575/2024 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/120002 |
+| PROPOSTA DE EMENDA À CONSTITUIÇÃO 1/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/112530 |
+| PROJETO DE LEI 29/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/111195 |
+| PROJETO DE LEI 124/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/111595 |
+| PROJETO DE LEI 125/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/111597 |
+| PROJETO DE LEI 621/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/113942 |
+| PROJETO DE LEI 625/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/113995 |
+| PROJETO DE LEI 710/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/114335 |
+| PROJETO DE LEI 769/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/114759 |
+| PROJETO DE LEI 817/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/115047 |
+| PROJETO DE LEI 818/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/115048 |
+| PROJETO DE LEI 819/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/115049 |
+| PROJETO DE LEI 888/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/115361 |
+| PROJETO DE LEI 1009/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/115736 |
+| PROJETO DE LEI 1055/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/116449 |
+
+### Conferindo com ajuda de uma IA
+
+Se preferir nao ler o registro bruto, que vem em formato tecnico:
+
+1. Abra um dos enderecos acima no navegador.
+2. Selecione tudo (Ctrl+A), copie (Ctrl+C).
+3. Cole num assistente de IA junto com este dossie e peca:
+   *"Confira se o que o dossie afirma sobre esta proposicao bate com o
+   registro oficial que colei. Aponte qualquer divergencia."*
+
+A IA le o formato tecnico por voce. A conferencia continua sendo contra
+a fonte, porque o texto colado veio da Assembleia, nao deste projeto.
+
+### Conferindo os totais
+
+Os totais deste dossie, como "342 proposicoes", nao se conferem por um
+endereco so: exigem somar o conjunto inteiro. Dois caminhos:
+
+- `dados/conferencia/CONFERENCIA.md`, no repositorio, traz a recontagem
+  de todos os parlamentares feita por rotina independente do pipeline.
+- Quem tiver Python instalado roda a conferencia por conta propria:
+  `python scripts_aux/conferir_parlamentar.py "LUIZ FERNANDO GUERRA"`
+
+### Uma ressalva sobre o site da Assembleia
+
+As paginas de perfil dos deputados em assembleia.pr.leg.br estao com
+exibicao suspensa durante o periodo eleitoral, por forca do art. 73 da
+Lei nº 9.504/1997. Os enderecos de dados indicados acima seguem no ar,
+porque sao servico de dados abertos, nao publicidade institucional.
 
 
 ---

@@ -14,6 +14,28 @@ de `_PANORAMA.md`, no mesmo diretorio.
 | Normas sancionadas vinculadas | 40 |
 | Arquivadas | 1199 |
 | Em tramitacao | 737 |
+| Homenagens (mencao, congratulacoes, louvor) | 516 |
+| Votos de pesar | 384 |
+
+Homenagem e pesar vem separados porque a Casa os classifica como assuntos
+distintos: voto de pesar registra falecimento, nao concede honraria.
+
+## Distribuicao por familia de assunto
+
+| Familia | Quantidade |
+|---|---:|
+| EXPEDIENTE E TRÂMITE | 722 |
+| HOMENAGEM | 516 |
+| PESAR | 384 |
+| POLÍTICA PÚBLICA | 216 |
+| AUSÊNCIA | 50 |
+| ORGANIZAÇÃO INTERNA | 16 |
+| FISCALIZAÇÃO | 9 |
+| SEM CLASSIFICAÇÃO NA ORIGEM | 9 |
+| UTILIDADE PÚBLICA | 8 |
+| TÉCNICA LEGISLATIVA | 4 |
+| TRIBUTO E ORÇAMENTO | 1 |
+| SERVIDOR PÚBLICO | 1 |
 
 ## Distribuicao por especie
 
@@ -641,34 +663,424 @@ individualmente com ementa.
 
 Agregados por assunto atribuido pela Casa, por serem numerosos e repetitivos.
 
-| Assunto | Quantidade |
+Primeiro por familia, depois pelo rotulo oficial dentro de cada uma.
+As familias constam de directives/familias_de_assunto.md, que declara a
+que grupo cada rotulo da Casa pertence. Nenhuma ementa foi interpretada.
+
+| Familia | Quantidade |
+|---|---:|
+| **EXPEDIENTE E TRÂMITE** | **722** |
+| **HOMENAGEM** | **501** |
+| **PESAR** | **384** |
+| **AUSÊNCIA** | **50** |
+| **POLÍTICA PÚBLICA** | **17** |
+| **ORGANIZAÇÃO INTERNA** | **15** |
+| **SEM CLASSIFICAÇÃO NA ORIGEM** | **5** |
+| **FISCALIZAÇÃO** | **2** |
+
+**EXPEDIENTE E TRÂMITE** (722)
+
+| Rotulo oficial | Quantidade |
 |---|---:|
 | ENVIO DE EXPEDIENTE | 627 |
-| VOTOS DE LOUVOR | 479 |
-| VOTOS DE PESAR | 384 |
-| AUSÊNCIA / FALTA | 50 |
 | COAUTORIA | 43 |
 | EMENDAS | 42 |
-| SEGURANÇA PÚBLICA | 13 |
-| MOÇÃO DE APOIO | 11 |
-| FRENTE PARLAMENTAR | 8 |
 | ARQUIVAMENTO | 7 |
-| ASSUNTO A DEFINIR | 5 |
+| ANTECIPAÇÃO DE HORÁRIO DA SESSÃO PLENÁRIA | 1 |
+| VOTAÇÃO | 1 |
+| ARQUIVAMENTO / DESARQUIVAMENTO DE PROPOSIÇÕES | 1 |
+
+**HOMENAGEM** (501)
+
+| Rotulo oficial | Quantidade |
+|---|---:|
+| VOTOS DE LOUVOR | 479 |
+| MOÇÃO DE APOIO | 11 |
 | MENÇÃO HONROSA | 5 |
 | CONGRATULAÇÕES | 4 |
-| PEDIDO DE INFORMAÇÃO | 2 |
-| ALEP | 2 |
-| RESERVA GRANDE EXPEDIENTE | 2 |
 | SESSÃO SOLENE | 2 |
-| COMISSÃO ESPECIAL | 2 |
-| ANTECIPAÇÃO DE HORÁRIO DA SESSÃO PLENÁRIA | 1 |
+
+**PESAR** (384)
+
+| Rotulo oficial | Quantidade |
+|---|---:|
+| VOTOS DE PESAR | 384 |
+
+**AUSÊNCIA** (50)
+
+| Rotulo oficial | Quantidade |
+|---|---:|
+| AUSÊNCIA / FALTA | 50 |
+
+**POLÍTICA PÚBLICA** (17)
+
+| Rotulo oficial | Quantidade |
+|---|---:|
+| SEGURANÇA PÚBLICA | 13 |
 | DEFICIENTES | 1 |
 | POLÍTICAS PÚBLICAS | 1 |
-| VOTAÇÃO | 1 |
 | EDUCAÇÃO | 1 |
-| ARQUIVAMENTO / DESARQUIVAMENTO DE PROPOSIÇÕES | 1 |
-| INDICAÇÃO DE MEMBROS | 1 |
 | RODOVIAS | 1 |
+
+**ORGANIZAÇÃO INTERNA** (15)
+
+| Rotulo oficial | Quantidade |
+|---|---:|
+| FRENTE PARLAMENTAR | 8 |
+| ALEP | 2 |
+| RESERVA GRANDE EXPEDIENTE | 2 |
+| COMISSÃO ESPECIAL | 2 |
+| INDICAÇÃO DE MEMBROS | 1 |
+
+**SEM CLASSIFICAÇÃO NA ORIGEM** (5)
+
+| Rotulo oficial | Quantidade |
+|---|---:|
+| ASSUNTO A DEFINIR | 5 |
+
+**FISCALIZAÇÃO** (2)
+
+| Rotulo oficial | Quantidade |
+|---|---:|
+| PEDIDO DE INFORMAÇÃO | 2 |
+
+## Como conferir estes numeros na fonte
+
+Nao e preciso confiar neste arquivo. Cada proposicao tem um codigo no
+sistema da Assembleia, e o registro oficial de qualquer uma delas abre
+direto no navegador, sem instalar nada:
+
+    http://webservices.assembleia.pr.leg.br/api/public/proposicao/CODIGO
+
+A pagina devolve o registro bruto da Casa, com autor, ementa, situacao,
+historico de tramitacao e normas vinculadas. E a fonte primaria: o que
+aparece ali nao passou por este projeto.
+
+### Normas sancionadas, uma a uma
+
+Sao as afirmacoes de maior peso deste dossie. Confira cada uma:
+
+| Norma | Proposicao de origem | Conferir na fonte |
+|---|---|---|
+| Lei 23200/2026 | PROJETO DE LEI 195/2026 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/128515 |
+| Lei 23026/2026 | PROJETO DE LEI 1098/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/126846 |
+| Lei 23036/2026 | PROJETO DE LEI 91/2026 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/128039 |
+| Lei 22964/2025 | PROJETO DE LEI 1053/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/116389 |
+| Lei 22963/2025 | PROJETO DE LEI 1169/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/127183 |
+| Lei 22947/2025 | PROJETO DE LEI 602/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/113891 |
+| Lei 22949/2025 | PROJETO DE LEI 769/2024 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/121175 |
+| Lei 22937/2025 | PROJETO DE LEI 673/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/124819 |
+| Lei 22950/2025 | PROJETO DE LEI 1062/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/126653 |
+| Emenda Constitucional - EC 57/2025 | PROPOSTA DE EMENDA À CONSTITUIÇÃO 4/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/125646 |
+| Lei 22828/2025 | PROJETO DE LEI 781/2024 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/121245 |
+| Lei 22736/2025 | PROJETO DE LEI 128/2024 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/117175 |
+| Lei 22717/2025 | PROJETO DE LEI 600/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/113888 |
+| Lei 22693/2025 | PROJETO DE LEI 754/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/114645 |
+| Lei 22701/2025 | PROJETO DE LEI 383/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/123350 |
+| Lei 22574/2025 | PROJETO DE LEI 426/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/112830 |
+| Lei 22506/2025 | PROJETO DE LEI 351/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/123268 |
+| Lei 22478/2025 | PROJETO DE LEI 111/2024 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/117066 |
+| Lei 22449/2025 | PROJETO DE LEI 50/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/121540 |
+| Lei 22429/2025 | PROJETO DE LEI 566/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/113695 |
+| Lei 22395/2025 | PROJETO DE LEI 451/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/112910 |
+| Lei 22351/2025 | PROJETO DE LEI 233/2024 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/117933 |
+| Lei 22340/2025 | PROJETO DE LEI 715/2024 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/120958 |
+| Lei 22303/2025 | PROJETO DE LEI 803/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/114960 |
+| Lei 22266/2024 | PROJETO DE LEI 18/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/111145 |
+| Lei 22251/2024 | PROJETO DE LEI 417/2024 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/119034 |
+| Lei 22130/2024 | PROJETO DE LEI 1055/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/116449 |
+| Lei 22079/2024 | PROJETO DE LEI 362/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/112603 |
+| Lei 22046/2024 | PROJETO DE LEI 347/2024 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/118382 |
+| Lei 22003/2024 | PROJETO DE LEI 920/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/115487 |
+| Lei 22001/2024 | PROJETO DE LEI 925/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/115516 |
+| Lei 21990/2024 | PROJETO DE LEI 452/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/112911 |
+| Lei 21968/2024 | PROJETO DE LEI 548/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/113203 |
+| Lei 21964/2024 | PROJETO DE LEI 710/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/114335 |
+| Lei 21926/2024 | PROJETO DE LEI 625/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/113995 |
+| Lei 21826/2023 | PROJETO DE LEI 644/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/114088 |
+| Lei 21696/2023 | PROJETO DE LEI 674/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/114229 |
+| Lei 21691/2023 | PROJETO DE LEI 363/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/112604 |
+| Lei 21709/2023 | PROJETO DE LEI 597/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/113883 |
+| Lei 21536/2023 | PROJETO DE LEI 234/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/112083 |
+
+Ao abrir, procure o trecho `normasLegais`. Ele traz o numero da lei, a
+data e a situacao. Se o que esta la divergir do que este arquivo
+afirma, o erro e deste arquivo.
+
+### Proposicoes normativas
+
+| Proposicao | Conferir na fonte |
+|---|---|
+| PROJETO DE LEI 47/2026 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/127920 |
+| PROJETO DE LEI 48/2026 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/127921 |
+| PROJETO DE LEI 49/2026 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/127922 |
+| PROJETO DE LEI 50/2026 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/127923 |
+| PROJETO DE LEI 51/2026 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/127924 |
+| PROJETO DE LEI 52/2026 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/127925 |
+| PROJETO DE LEI 53/2026 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/127926 |
+| PROJETO DE LEI 58/2026 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/127943 |
+| PROJETO DE LEI 87/2026 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/128020 |
+| PROJETO DE LEI 88/2026 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/128021 |
+| PROJETO DE LEI 89/2026 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/128022 |
+| PROJETO DE LEI 91/2026 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/128039 |
+| PROJETO DE LEI 195/2026 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/128515 |
+| PROJETO DE LEI 216/2026 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/128597 |
+| PROPOSTA DE EMENDA À CONSTITUIÇÃO 4/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/125646 |
+| PROJETO DE LEI COMPLEMENTAR 11/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/125058 |
+| PROJETO DE LEI 50/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/121540 |
+| PROJETO DE LEI 60/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/121593 |
+| PROJETO DE LEI 61/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/121601 |
+| PROJETO DE LEI 65/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/121629 |
+| PROJETO DE LEI 76/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/121669 |
+| PROJETO DE LEI 77/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/121670 |
+| PROJETO DE LEI 79/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/121675 |
+| PROJETO DE LEI 114/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/121872 |
+| PROJETO DE LEI 124/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/121934 |
+| PROJETO DE LEI 126/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/121930 |
+| PROJETO DE LEI 140/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/122035 |
+| PROJETO DE LEI 242/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/122654 |
+| PROJETO DE LEI 243/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/122656 |
+| PROJETO DE LEI 277/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/122898 |
+| PROJETO DE LEI 297/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/122955 |
+| PROJETO DE LEI 298/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/122956 |
+| PROJETO DE LEI 320/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/123030 |
+| PROJETO DE LEI 329/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/123147 |
+| PROJETO DE LEI 333/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/123092 |
+| PROJETO DE LEI 348/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/123251 |
+| PROJETO DE LEI 351/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/123268 |
+| PROJETO DE LEI 376/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/123355 |
+| PROJETO DE LEI 383/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/123350 |
+| PROJETO DE LEI 390/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/123460 |
+| PROJETO DE LEI 462/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/123874 |
+| PROJETO DE LEI 463/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/123875 |
+| PROJETO DE LEI 464/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/123876 |
+| PROJETO DE LEI 465/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/123877 |
+| PROJETO DE LEI 466/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/123879 |
+| PROJETO DE LEI 467/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/123881 |
+| PROJETO DE LEI 586/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/124484 |
+| PROJETO DE LEI 588/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/124497 |
+| PROJETO DE LEI 636/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/124657 |
+| PROJETO DE LEI 637/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/124658 |
+| PROJETO DE LEI 638/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/124659 |
+| PROJETO DE LEI 639/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/124660 |
+| PROJETO DE LEI 640/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/124661 |
+| PROJETO DE LEI 673/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/124819 |
+| PROJETO DE LEI 685/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/124915 |
+| PROJETO DE LEI 728/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/125111 |
+| PROJETO DE LEI 755/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/125223 |
+| PROJETO DE LEI 759/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/125283 |
+| PROJETO DE LEI 760/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/125285 |
+| PROJETO DE LEI 761/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/125286 |
+| PROJETO DE LEI 762/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/125287 |
+| PROJETO DE LEI 764/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/125302 |
+| PROJETO DE LEI 791/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/125395 |
+| PROJETO DE LEI 793/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/125396 |
+| PROJETO DE LEI 839/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/125614 |
+| PROJETO DE LEI 889/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/125616 |
+| PROJETO DE LEI 967/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/126136 |
+| PROJETO DE LEI 968/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/126137 |
+| PROJETO DE LEI 994/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/126341 |
+| PROJETO DE LEI 1043/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/126529 |
+| PROJETO DE LEI 1044/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/126530 |
+| PROJETO DE LEI 1045/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/126532 |
+| PROJETO DE LEI 1047/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/126533 |
+| PROJETO DE LEI 1049/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/126540 |
+| PROJETO DE LEI 1050/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/126541 |
+| PROJETO DE LEI 1056/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/126563 |
+| PROJETO DE LEI 1057/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/126564 |
+| PROJETO DE LEI 1062/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/126653 |
+| PROJETO DE LEI 1063/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/126654 |
+| PROJETO DE LEI 1064/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/126656 |
+| PROJETO DE LEI 1065/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/126657 |
+| PROJETO DE LEI 1098/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/126846 |
+| PROJETO DE LEI 1104/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/126908 |
+| PROJETO DE LEI 1114/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/126989 |
+| PROJETO DE LEI 1169/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/127183 |
+| PROJETO DE LEI 1171/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/127185 |
+| PROJETO DE LEI 1196/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/127357 |
+| PROJETO DE LEI 1201/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/127390 |
+| PROJETO DE LEI 1204/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/127420 |
+| PROJETO DE LEI 1205/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/127422 |
+| PROJETO DE LEI 1206/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/127423 |
+| PROJETO DE LEI 1227/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/127519 |
+| PROJETO DE LEI 1228/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/127520 |
+| PROJETO DE LEI 1230/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/127522 |
+| PROJETO DE LEI 1231/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/127529 |
+| PROJETO DE LEI 1239/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/127568 |
+| PROJETO DE LEI 1240/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/127569 |
+| PROJETO DE LEI 1241/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/127515 |
+| PROJETO DE LEI 1243/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/127570 |
+| PROJETO DE LEI 1258/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/127703 |
+| PROJETO DE LEI 1259/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/127704 |
+| PROJETO DE LEI 1260/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/127705 |
+| PROJETO DE LEI 1261/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/127706 |
+| PROJETO DE LEI 1262/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/127707 |
+| PROJETO DE LEI 1263/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/127708 |
+| PROJETO DE LEI 1264/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/127709 |
+| PROJETO DE LEI 1265/2025 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/127710 |
+| PROPOSTA DE EMENDA À CONSTITUIÇÃO 2/2024 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/118458 |
+| PROJETO DE LEI 15/2024 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/116593 |
+| PROJETO DE LEI 45/2024 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/116687 |
+| PROJETO DE LEI 46/2024 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/116688 |
+| PROJETO DE LEI 49/2024 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/116710 |
+| PROJETO DE LEI 51/2024 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/116712 |
+| PROJETO DE LEI 52/2024 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/116713 |
+| PROJETO DE LEI 53/2024 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/116715 |
+| PROJETO DE LEI 79/2024 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/116844 |
+| PROJETO DE LEI 81/2024 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/116859 |
+| PROJETO DE LEI 111/2024 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/117066 |
+| PROJETO DE LEI 128/2024 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/117175 |
+| PROJETO DE LEI 132/2024 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/115044 |
+| PROJETO DE LEI 148/2024 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/117439 |
+| PROJETO DE LEI 152/2024 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/117505 |
+| PROJETO DE LEI 217/2024 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/117863 |
+| PROJETO DE LEI 218/2024 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/117864 |
+| PROJETO DE LEI 233/2024 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/117933 |
+| PROJETO DE LEI 281/2024 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/118234 |
+| PROJETO DE LEI 282/2024 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/118235 |
+| PROJETO DE LEI 283/2024 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/118236 |
+| PROJETO DE LEI 322/2024 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/118412 |
+| PROJETO DE LEI 326/2024 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/118392 |
+| PROJETO DE LEI 347/2024 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/118382 |
+| PROJETO DE LEI 392/2024 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/118933 |
+| PROJETO DE LEI 395/2024 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/118982 |
+| PROJETO DE LEI 417/2024 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/119034 |
+| PROJETO DE LEI 441/2024 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/119106 |
+| PROJETO DE LEI 442/2024 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/119121 |
+| PROJETO DE LEI 443/2024 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/119123 |
+| PROJETO DE LEI 444/2024 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/119124 |
+| PROJETO DE LEI 467/2024 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/119254 |
+| PROJETO DE LEI 484/2024 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/119378 |
+| PROJETO DE LEI 532/2024 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/119727 |
+| PROJETO DE LEI 561/2024 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/119949 |
+| PROJETO DE LEI 624/2024 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/120292 |
+| PROJETO DE LEI 692/2024 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/120777 |
+| PROJETO DE LEI 715/2024 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/120958 |
+| PROJETO DE LEI 734/2024 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/121013 |
+| PROJETO DE LEI 735/2024 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/121014 |
+| PROJETO DE LEI 736/2024 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/121016 |
+| PROJETO DE LEI 737/2024 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/121017 |
+| PROJETO DE LEI 738/2024 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/121019 |
+| PROJETO DE LEI 739/2024 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/121020 |
+| PROJETO DE LEI 740/2024 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/121022 |
+| PROJETO DE LEI 760/2024 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/121158 |
+| PROJETO DE LEI 761/2024 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/121161 |
+| PROJETO DE LEI 762/2024 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/121163 |
+| PROJETO DE LEI 763/2024 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/121164 |
+| PROJETO DE LEI 764/2024 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/121166 |
+| PROJETO DE LEI 765/2024 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/121167 |
+| PROJETO DE LEI 766/2024 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/121168 |
+| PROJETO DE LEI 767/2024 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/121171 |
+| PROJETO DE LEI 768/2024 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/121172 |
+| PROJETO DE LEI 769/2024 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/121175 |
+| PROJETO DE LEI 781/2024 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/121245 |
+| PROPOSTA DE EMENDA À CONSTITUIÇÃO 1/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/112530 |
+| PROJETO DE LEI 17/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/111142 |
+| PROJETO DE LEI 18/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/111145 |
+| PROJETO DE LEI 36/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/111265 |
+| PROJETO DE LEI 37/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/111266 |
+| PROJETO DE LEI 38/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/111267 |
+| PROJETO DE LEI 39/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/111268 |
+| PROJETO DE LEI 77/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/111401 |
+| PROJETO DE LEI 115/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/111544 |
+| PROJETO DE LEI 135/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/111651 |
+| PROJETO DE LEI 156/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/111756 |
+| PROJETO DE LEI 168/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/111812 |
+| PROJETO DE LEI 196/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/111930 |
+| PROJETO DE LEI 197/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/111931 |
+| PROJETO DE LEI 213/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/112023 |
+| PROJETO DE LEI 214/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/112025 |
+| PROJETO DE LEI 234/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/112083 |
+| PROJETO DE LEI 235/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/112084 |
+| PROJETO DE LEI 236/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/112085 |
+| PROJETO DE LEI 237/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/112086 |
+| PROJETO DE LEI 238/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/112098 |
+| PROJETO DE LEI 239/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/112097 |
+| PROJETO DE LEI 362/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/112603 |
+| PROJETO DE LEI 363/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/112604 |
+| PROJETO DE LEI 386/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/112688 |
+| PROJETO DE LEI 387/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/112689 |
+| PROJETO DE LEI 414/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/112741 |
+| PROJETO DE LEI 423/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/112813 |
+| PROJETO DE LEI 426/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/112830 |
+| PROJETO DE LEI 450/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/112909 |
+| PROJETO DE LEI 451/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/112910 |
+| PROJETO DE LEI 452/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/112911 |
+| PROJETO DE LEI 487/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/113162 |
+| PROJETO DE LEI 548/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/113203 |
+| PROJETO DE LEI 566/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/113695 |
+| PROJETO DE LEI 582/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/113793 |
+| PROJETO DE LEI 595/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/113880 |
+| PROJETO DE LEI 596/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/113881 |
+| PROJETO DE LEI 597/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/113883 |
+| PROJETO DE LEI 598/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/113885 |
+| PROJETO DE LEI 600/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/113888 |
+| PROJETO DE LEI 601/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/113890 |
+| PROJETO DE LEI 602/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/113891 |
+| PROJETO DE LEI 603/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/113894 |
+| PROJETO DE LEI 604/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/113896 |
+| PROJETO DE LEI 607/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/113907 |
+| PROJETO DE LEI 622/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/113990 |
+| PROJETO DE LEI 623/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/113994 |
+| PROJETO DE LEI 624/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/113996 |
+| PROJETO DE LEI 625/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/113995 |
+| PROJETO DE LEI 643/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/114084 |
+| PROJETO DE LEI 644/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/114088 |
+| PROJETO DE LEI 645/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/114098 |
+| PROJETO DE LEI 646/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/114099 |
+| PROJETO DE LEI 647/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/114100 |
+| PROJETO DE LEI 657/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/114127 |
+| PROJETO DE LEI 674/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/114229 |
+| PROJETO DE LEI 695/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/114286 |
+| PROJETO DE LEI 710/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/114335 |
+| PROJETO DE LEI 712/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/114414 |
+| PROJETO DE LEI 713/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/114412 |
+| PROJETO DE LEI 714/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/114410 |
+| PROJETO DE LEI 731/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/114461 |
+| PROJETO DE LEI 732/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/114463 |
+| PROJETO DE LEI 749/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/114586 |
+| PROJETO DE LEI 754/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/114645 |
+| PROJETO DE LEI 757/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/114653 |
+| PROJETO DE LEI 758/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/114654 |
+| PROJETO DE LEI 802/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/114959 |
+| PROJETO DE LEI 803/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/114960 |
+| PROJETO DE LEI 838/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/115045 |
+| PROJETO DE LEI 920/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/115487 |
+| PROJETO DE LEI 925/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/115516 |
+| PROJETO DE LEI 947/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/115616 |
+| PROJETO DE LEI 986/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/115839 |
+| PROJETO DE LEI 1053/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/116389 |
+| PROJETO DE LEI 1055/2023 | http://webservices.assembleia.pr.leg.br/api/public/proposicao/116449 |
+
+### Conferindo com ajuda de uma IA
+
+Se preferir nao ler o registro bruto, que vem em formato tecnico:
+
+1. Abra um dos enderecos acima no navegador.
+2. Selecione tudo (Ctrl+A), copie (Ctrl+C).
+3. Cole num assistente de IA junto com este dossie e peca:
+   *"Confira se o que o dossie afirma sobre esta proposicao bate com o
+   registro oficial que colei. Aponte qualquer divergencia."*
+
+A IA le o formato tecnico por voce. A conferencia continua sendo contra
+a fonte, porque o texto colado veio da Assembleia, nao deste projeto.
+
+### Conferindo os totais
+
+Os totais deste dossie, como "1936 proposicoes", nao se conferem por um
+endereco so: exigem somar o conjunto inteiro. Dois caminhos:
+
+- `dados/conferencia/CONFERENCIA.md`, no repositorio, traz a recontagem
+  de todos os parlamentares feita por rotina independente do pipeline.
+- Quem tiver Python instalado roda a conferencia por conta propria:
+  `python scripts_aux/conferir_parlamentar.py "NEY LEPREVOST"`
+
+### Uma ressalva sobre o site da Assembleia
+
+As paginas de perfil dos deputados em assembleia.pr.leg.br estao com
+exibicao suspensa durante o periodo eleitoral, por forca do art. 73 da
+Lei nº 9.504/1997. Os enderecos de dados indicados acima seguem no ar,
+porque sao servico de dados abertos, nao publicidade institucional.
 
 
 ---
