@@ -6,7 +6,7 @@
   <title>Dashboard Analítico — ALEP PR 2026 (V5)</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-  <script src="DADOS_ALEP_20.js?v=540320ae"></script>
+  <script src="DADOS_ALEP_20.js?v=9fbd8bed"></script>
   <style>
     :root {
       --bg: #0b0d11;
@@ -168,9 +168,9 @@
       <div class="sub">Produção Legislativa da ALEP</div>
     </div>
     <div class="kpi gold" id="kpiMen">
-      <div class="label">Menções Honrosas</div>
+      <div class="label">Homenagens</div>
       <div class="value" id="val-men">—</div>
-      <div class="sub">Acompanhamento e Liderança</div>
+      <div class="sub" id="sub-men">Menção honrosa, congratulações, louvor</div>
     </div>
     <div class="kpi green" id="kpiLeis">
       <div class="label">Leis Aprovadas</div>
@@ -192,13 +192,20 @@
       </select>
     </div>
     <div class="filter-group">
+      <label>Família de Assunto</label>
+      <select id="familiaFilter" onchange="renderTable(); renderTemas();">
+        <option value="ALL">Todas as famílias</option>
+      </select>
+    </div>
+    <div class="filter-group">
       <label>Ordenar Por</label>
       <select id="sortKey" onchange="renderTable()">
         <option value="leis_count">Leis Aprovadas</option>
         <option value="proposicoes_count">Produtividade Total</option>
         <option value="projetos_lei">Projetos de Lei (PLs)</option>
         <option value="requerimentos">Requerimentos</option>
-        <option value="mencoes_honrosas">Menções Honrosas</option>
+        <option value="homenagens">Homenagens</option>
+        <option value="pesar">Votos de Pesar</option>
       </select>
     </div>
     <div class="filter-group" style="max-width: 150px;">
@@ -208,6 +215,33 @@
         <option value="30">30 itens</option>
         <option value="999">Todos</option>
       </select>
+    </div>
+  </div>
+
+  <!-- Temas -->
+  <div class="charts-grid">
+    <div class="chart-card">
+      <h3 id="tituloFamilias">Distribuição por Família de Assunto</h3>
+      <div style="display:flex; align-items:center; gap:0.8rem; margin:-0.8rem 0 1rem;">
+        <span id="escopoTemas" style="font-size:0.72rem; color:var(--muted); font-weight:600;">Exibindo: a Casa inteira</span>
+        <button id="btnLimparEscopo" onclick="limparEscopoTemas()"
+                style="display:none; background:var(--card2); border:1px solid var(--border);
+                       color:var(--text); font-size:0.68rem; padding:3px 10px; border-radius:20px;
+                       cursor:pointer; font-family:inherit;">voltar à Casa inteira</button>
+      </div>
+      <div class="chart-wrap"><canvas id="chartFamilias"></canvas></div>
+      <p style="font-size:0.7rem; color:var(--muted); margin-top:0.8rem; line-height:1.4">
+        Famílias declaradas em <code>directives/familias_de_assunto.md</code>, a partir do
+        rótulo de assunto atribuído pela ALEP. Nenhuma ementa foi interpretada.
+      </p>
+    </div>
+    <div class="chart-card">
+      <h3 id="tituloRotulos">Assuntos mais frequentes</h3>
+      <div class="chart-wrap"><canvas id="chartRotulos"></canvas></div>
+      <p style="font-size:0.7rem; color:var(--muted); margin-top:0.8rem; line-height:1.4">
+        Rótulo oficial, como consta do registro da Casa. Selecione uma família no filtro
+        acima para ver apenas os rótulos dela.
+      </p>
     </div>
   </div>
 
@@ -234,7 +268,8 @@
             <th onclick="changeSort('proposicoes_count')">Proposições</th>
             <th onclick="changeSort('projetos_lei')">PLs</th>
             <th onclick="changeSort('requerimentos')">Requerimentos</th>
-            <th onclick="changeSort('mencoes_honrosas')">Menções</th>
+            <th onclick="changeSort('homenagens')" title="Menção honrosa, congratulações, voto de louvor e títulos. Não inclui voto de pesar.">Homenagens</th>
+            <th onclick="changeSort('pesar')" title="Votos de pesar, registrados separadamente por não serem honraria.">Pesar</th>
             <th onclick="changeSort('leis_count')">Leis Aprovadas</th>
           </tr>
         </thead>
@@ -256,8 +291,15 @@
 
 let chartA = null;
 let chartB = null;
+let chartC = null;
+let chartD = null;
 let deputadosProcessados = [];
 let temasRequerimentosGlobal = new Set();
+let familiasGlobais = new Set();
+// Escopo dos graficos de tema. null = a Casa inteira; nome = um parlamentar;
+// array = o resultado da busca. Permite que a distribuicao exposta seja sempre
+// a de quem o usuario esta olhando.
+let escopoTemas = null;
 
 const CORES = [
   '#6c63ff', '#00d4aa', '#ff6b6b', '#f5a623', '#36a2eb',
@@ -269,28 +311,39 @@ function prepararDados() {
     const institucional = ["PODER EXECUTIVO", "COMISSÃO", "MESA EXECUTIVA", "TRIBUNAL", "MINISTÉRIO", "DEFENSORIA"];
     let raw = DADOS.filter(d => !institucional.some(i => d.nome.includes(i)));
 
-    // Processa estatísticas extras baseadas na lista de proposições
+    // Processa estatísticas extras baseadas na lista de proposições.
+    //
+    // A classificação usa o rótulo de assunto atribuído pela própria ALEP e a
+    // família declarada em directives/familias_de_assunto.md. A versão anterior
+    // procurava palavras na ementa ("MENÇÃO HONROSA", "PESAR"...), o que era
+    // inferência sobre texto livre e juntava num só balde quatro atos que a
+    // Casa já distingue: menção honrosa, congratulações, voto de louvor e voto
+    // de pesar. Voto de pesar é condolência, não honraria.
     deputadosProcessados = raw.map(dep => {
         let projetos_lei = 0;
         let requerimentos = 0;
-        let mencoes_honrosas = 0;
+        let homenagens = 0;
+        let pesar = 0;
+        const porFamilia = {};
 
         dep.proposicoes_lista.forEach(p => {
             const tipo = p.tipo.toUpperCase();
-            const ementa = (p.ementa || '').toUpperCase();
-            let tema = p.tema ? p.tema.toUpperCase() : "OUTROS";
+            const tema = p.tema ? p.tema.toUpperCase() : "OUTROS";
+            const familia = p.familia || "NAO CLASSIFICADO";
             p.temaFormatado = tema;
-            
+            p.familiaFormatada = familia;
+
+            porFamilia[familia] = (porFamilia[familia] || 0) + 1;
+            familiasGlobais.add(familia);
+
+            if (familia === "HOMENAGEM") homenagens++;
+            if (familia === "PESAR") pesar++;
+
             if (tipo.includes("PROJETO DE LEI")) {
                 projetos_lei++;
             } else if (tipo.includes("REQUERIMENTO")) {
                 requerimentos++;
                 temasRequerimentosGlobal.add(tema);
-                
-                // Lógica de menções honrosas aprimorada
-                if (ementa.includes("MENÇÃO HONROSA") || ementa.includes("CONGRATULAÇÕES") || ementa.includes("LOUVOR") || ementa.includes("PESAR")) {
-                    mencoes_honrosas++;
-                }
             }
         });
 
@@ -298,7 +351,11 @@ function prepararDados() {
             ...dep,
             projetos_lei,
             requerimentos,
-            mencoes_honrosas
+            homenagens,
+            pesar,
+            porFamilia,
+            // mantido para as colunas existentes, agora com base registral
+            mencoes_honrosas: homenagens
         };
     });
 }
@@ -307,20 +364,31 @@ function updateKPIs() {
     let propTot = 0;
     let leisTot = 0;
     let menTot = 0;
+    let pesarTot = 0;
 
     deputadosProcessados.forEach(d => {
         propTot += d.proposicoes_count;
         leisTot += d.leis_count;
-        menTot += d.mencoes_honrosas;
+        menTot += d.homenagens;
+        pesarTot += d.pesar;
     });
 
     document.getElementById('val-dep').innerText = deputadosProcessados.length;
     document.getElementById('val-prop').innerText = propTot.toLocaleString('pt-BR');
     document.getElementById('val-leis').innerText = leisTot.toLocaleString('pt-BR');
     document.getElementById('val-men').innerText = menTot.toLocaleString('pt-BR');
+    document.getElementById('sub-men').innerText =
+        'Menção honrosa, congratulações, louvor. ' +
+        pesarTot.toLocaleString('pt-BR') + ' votos de pesar contados à parte.';
 }
 
 function populateFilters() {
+    const selFam = document.getElementById('familiaFilter');
+    Array.from(familiasGlobais).sort().forEach(f => {
+        const o = document.createElement('option');
+        o.value = f; o.text = f;
+        selFam.appendChild(o);
+    });
     const partySet = new Set(deputadosProcessados.map(d => d.partido));
     const sel = document.getElementById('partyFilter');
     Array.from(partySet).sort().forEach(p => {
@@ -365,11 +433,20 @@ function renderTable() {
     }
 
     // Filtro
+    const familiaFiltro = document.getElementById('familiaFilter').value;
     let finalData = deputadosProcessados.filter(d => {
         const matchNome = d.nome.toLowerCase().includes(termo);
         const matchPartido = partidoFiltro === "ALL" || d.partido === partidoFiltro;
-        return matchNome && matchPartido;
+        // Filtrar por família mantém só quem atuou naquela família, e a contagem
+        // exibida passa a ser a daquela família, não a produção total.
+        const matchFamilia = familiaFiltro === "ALL" || (d.porFamilia[familiaFiltro] || 0) > 0;
+        return matchNome && matchPartido && matchFamilia;
     });
+
+    if (familiaFiltro !== "ALL") {
+        finalData = finalData.map(d => ({ ...d, naFamilia: d.porFamilia[familiaFiltro] || 0 }));
+        finalData.sort((a, b) => b.naFamilia - a.naFamilia);
+    }
 
     // Ordenação
     finalData.sort((a, b) => {
@@ -383,6 +460,14 @@ function renderTable() {
     });
 
     document.getElementById('tableCount').innerText = `Exibindo ${Math.min(finalData.length, limit)} de ${finalData.length} parlamentares`;
+
+    // A busca nominal passa a reger os graficos de tema, desde que nao haja
+    // um parlamentar aberto no painel de detalhe, que tem precedencia.
+    if (typeof escopoTemas !== 'string') {
+        const buscando = termo.trim().length > 0;
+        escopoTemas = buscando ? finalData : null;
+        if (typeof renderTemas === 'function' && chartC) renderTemas();
+    }
 
     // Aplica limite
     let viewData = limit === 999 ? finalData : finalData.slice(0, limit);
@@ -404,10 +489,141 @@ function renderTable() {
             <td style="font-weight:600">${d.proposicoes_count}</td>
             <td>${d.projetos_lei}</td>
             <td>${d.requerimentos}</td>
-            <td style="color:var(--gold)">${d.mencoes_honrosas}</td>
+            <td style="color:var(--gold)">${d.homenagens}</td>
+            <td style="color:var(--muted)">${d.pesar}</td>
             <td style="color:var(--accent2); font-weight:800">${d.leis_count}</td>
         `;
         tbody.appendChild(tr);
+    });
+}
+
+// Conta proposições DISTINTAS, sem duplicar por coautoria. Uma proposição com
+// seis signatários apareceria seis vezes se contada pelos vínculos, e o
+// percentual por tema ficaria enviesado a favor das matérias mais coassinadas.
+function contarDistintas(chave, filtroFamilia, universo) {
+    const vistos = new Set();
+    const mapa = {};
+    (universo || deputadosProcessados).forEach(d => {
+        d.proposicoes_lista.forEach(p => {
+            if (vistos.has(p.id)) return;
+            vistos.add(p.id);
+            if (filtroFamilia && filtroFamilia !== 'ALL' && p.familia !== filtroFamilia) return;
+            const k = p[chave] || 'SEM CLASSIFICACAO';
+            mapa[k] = (mapa[k] || 0) + 1;
+        });
+    });
+    return mapa;
+}
+
+function pct(valor, total) {
+    return total ? (valor / total * 100) : 0;
+}
+
+function renderTemas() {
+    const familiaFiltro = document.getElementById('familiaFilter').value;
+
+    // Resolve de quem sao os numeros exibidos.
+    let universo = null, quem = 'a Casa inteira', individual = false;
+    if (typeof escopoTemas === 'string') {
+        const d = deputadosProcessados.find(x => x.nome === escopoTemas);
+        if (d) { universo = [d]; quem = d.nome; individual = true; }
+    } else if (Array.isArray(escopoTemas) && escopoTemas.length
+               && escopoTemas.length < deputadosProcessados.length) {
+        universo = escopoTemas;
+        if (escopoTemas.length === 1) { quem = escopoTemas[0].nome; individual = true; }
+        else { quem = `${escopoTemas.length} parlamentares da busca`; }
+    }
+
+    const marcador = document.getElementById('escopoTemas');
+    if (marcador) {
+        marcador.innerText = universo ? `Exibindo: ${quem}` : 'Exibindo: a Casa inteira';
+        marcador.style.color = universo ? 'var(--accent2)' : 'var(--muted)';
+    }
+    const btn = document.getElementById('btnLimparEscopo');
+    if (btn) btn.style.display = universo ? 'inline-block' : 'none';
+
+    // ─── Famílias, com percentual ───
+    const fam = contarDistintas('familia', 'ALL', universo);
+    const totalFam = Object.values(fam).reduce((a, b) => a + b, 0);
+    const famSort = Object.entries(fam).sort((a, b) => b[1] - a[1]);
+
+    const ctxC = document.getElementById('chartFamilias').getContext('2d');
+    if (chartC) chartC.destroy();
+    chartC = new Chart(ctxC, {
+        type: 'bar',
+        data: {
+            labels: famSort.map(f => f[0]),
+            datasets: [{
+                label: 'Proposições',
+                data: famSort.map(f => f[1]),
+                backgroundColor: CORES[0],
+                borderRadius: 4
+            }]
+        },
+        options: {
+            indexAxis: 'y',
+            responsive: true, maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: { callbacks: { label: c =>
+                    `${c.raw.toLocaleString('pt-BR')} proposições (${pct(c.raw, totalFam).toFixed(1)}%)` } }
+            },
+            scales: {
+                x: { ticks: { color: '#8892a4' }, grid: { color: '#2a313d' } },
+                y: { ticks: { color: '#e2e8f0', font: { size: 10 },
+                     callback: function(v) {
+                         const nome = this.getLabelForValue(v);
+                         const n = fam[nome] || 0;
+                         return `${nome}  ${pct(n, totalFam).toFixed(1)}%`;
+                     } }, grid: { display: false } }
+            }
+        }
+    });
+
+    // ─── Rótulos oficiais, respeitando o filtro de família ───
+    const rot = contarDistintas('tema', familiaFiltro, universo);
+    const totalRot = Object.values(rot).reduce((a, b) => a + b, 0);
+    const rotSort = Object.entries(rot).sort((a, b) => b[1] - a[1]).slice(0, 15);
+
+    const sufixo = individual ? ` de ${quem}` : (universo ? ' da seleção' : '');
+    document.getElementById('tituloRotulos').innerText =
+        (familiaFiltro === 'ALL'
+            ? 'Assuntos mais frequentes'
+            : `Assuntos em ${familiaFiltro}`) + sufixo;
+    document.getElementById('tituloFamilias').innerText =
+        'Distribuição por família de assunto' + sufixo;
+
+    const ctxD = document.getElementById('chartRotulos').getContext('2d');
+    if (chartD) chartD.destroy();
+    chartD = new Chart(ctxD, {
+        type: 'bar',
+        data: {
+            labels: rotSort.map(r => r[0]),
+            datasets: [{
+                label: 'Proposições',
+                data: rotSort.map(r => r[1]),
+                backgroundColor: CORES[1],
+                borderRadius: 4
+            }]
+        },
+        options: {
+            indexAxis: 'y',
+            responsive: true, maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: { callbacks: { label: c =>
+                    `${c.raw.toLocaleString('pt-BR')} proposições (${pct(c.raw, totalRot).toFixed(1)}% da seleção)` } }
+            },
+            scales: {
+                x: { ticks: { color: '#8892a4' }, grid: { color: '#2a313d' } },
+                y: { ticks: { color: '#e2e8f0', font: { size: 10 },
+                     callback: function(v) {
+                         const nome = this.getLabelForValue(v);
+                         const n = rot[nome] || 0;
+                         return `${nome}  ${pct(n, totalRot).toFixed(1)}%`;
+                     } }, grid: { display: false } }
+            }
+        }
     });
 }
 
@@ -503,6 +719,10 @@ function renderCharts() {
 function openDetails(nome) {
     const d = deputadosProcessados.find(x => x.nome === nome);
     if (!d) return;
+
+    // Abrir um parlamentar passa os graficos de tema para os numeros dele.
+    escopoTemas = nome;
+    if (typeof renderTemas === 'function' && chartC) renderTemas();
 
     const propsOptions = [
         'Todas', 
@@ -702,6 +922,17 @@ function closeDetails() {
     document.getElementById('detailsPanel').classList.remove('open');
     document.getElementById('overlay').classList.remove('open');
     document.body.style.overflow = 'auto';
+    // Fechar o detalhe devolve os graficos ao escopo da busca em curso.
+    escopoTemas = null;
+    renderTable();
+    if (typeof renderTemas === 'function' && chartC) renderTemas();
+}
+
+function limparEscopoTemas() {
+    escopoTemas = null;
+    document.getElementById('mainSearch').value = '';
+    renderTable();
+    renderTemas();
 }
 
 // ─── PROCEDÊNCIA DOS DADOS ──────────────────────────
@@ -748,6 +979,7 @@ window.onload = () => {
     updateKPIs();
     renderTable();
     renderCharts();
+    renderTemas();
     renderMeta();
 };
 </script>

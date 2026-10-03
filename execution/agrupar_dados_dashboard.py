@@ -1,12 +1,16 @@
 import os
+import sys
 import json
 import glob
 import re
 import hashlib
 from datetime import datetime
 
+from familias import conferir_cobertura, familia_de
+
 # Configuração de Caminhos
 # Raiz do repositorio: este arquivo vive em <raiz>/execution/
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 WORKSPACE_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 RAW_PROPS_DIR = os.path.join(WORKSPACE_ROOT, ".tmp", "raw_proposicoes")
 RAW_DETAILS_DIR = os.path.join(WORKSPACE_ROOT, ".tmp", "raw_detalhes")
@@ -275,6 +279,7 @@ def processar():
                         "ano": p.get('ano'),
                         "tipo": p.get('tipoProposicao'),
                         "tema": p.get('assunto') or "OUTROS",
+                        "familia": familia_de(p.get('assunto')),
                         "status": p.get('status'),
                         "localAtual": p.get('localAtual') or "Não informado",
                         "ementa": p.get('ementa'),
@@ -339,6 +344,19 @@ def processar():
     print(f"Proposições com co-autoria válida: {stats['coautorias_validas']}")
     print(f"Duplicatas removidas: {stats['duplicatas_removidas']}")
     print(f"Deputados consolidados: {len(output_list)}")
+
+    # Rotulo novo na origem nao e adivinhado: e reportado para decisao humana
+    # em directives/familias_de_assunto.md.
+    rotulos = {(q.get("tema") or "SEM ASSUNTO") for d in output_list
+               for q in d["proposicoes_lista"]}
+    sem_familia = conferir_cobertura(rotulos)
+    if sem_familia:
+        print(f"[!] {len(sem_familia)} rotulo(s) de assunto sem familia na diretriz:")
+        for r in sem_familia:
+            print(f"      {r}")
+        print("    Classifique em directives/familias_de_assunto.md")
+    else:
+        print(f"Familias de assunto: {len(rotulos)} rotulos, todos classificados")
     print(f"Arquivo salvo: {OUTPUT_FILE}")
 
 if __name__ == "__main__":
