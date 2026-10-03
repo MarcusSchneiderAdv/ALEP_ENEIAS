@@ -57,9 +57,15 @@ Todas derivam de contagem sobre campos oficiais. Nenhuma envolve inferência.
 | Conversão em norma | Presença de vínculo em `normasLegais`. |
 | Situação processual | Campo `status` da fonte. |
 | Eventos de tramitação | Registros de `tramites`, ordenados por data. |
+| Família de assunto | Rótulo oficial `assunto` mapeado por `familias_de_assunto.md`. |
 
 **Métricas vedadas:** nota, ranking, índice de desempenho, classificação de mérito ou qualquer
-agregado que qualifique — e não apenas descreva — a atuação de parlamentar identificado.
+agregado que qualifique, e não apenas descreva, a atuação de parlamentar identificado.
+
+**Sobre a família de assunto.** É agregação de rótulos oficiais, não leitura de ementa. O
+de-para está em `familias_de_assunto.md` e é conferível linha a linha. O rótulo de origem
+permanece ao lado da família, de modo que nada se perde na agregação e qualquer revisão do
+mapa é rastreável.
 
 ## 5. Passo a passo
 
@@ -72,3 +78,6 @@ agregado que qualifique — e não apenas descreva — a atuação de parlamenta
    estimar o dado ausente.
 6. **Divulgação:** publicar código e resultados sob licença aberta, permitindo verificação
    independente.
+7. **Conferência:** recontar os números publicados contra a fonte por rotina que não
+   reaproveite o código do pipeline. Reexecutar o pipeline não comprova veracidade, pois,
+   sendo determinístico, ele apenas concorda consigo mesmo.

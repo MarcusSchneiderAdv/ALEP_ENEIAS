@@ -37,7 +37,25 @@ saiu dele.
   É proibido estimar, interpolar ou inferir o dado ausente. Lacuna declarada é sempre
   preferível a lacuna preenchida.
 
-## 3. Ciclo de auditoria
+## 3. Classificação de assunto
+
+O campo de assunto da ALEP tem 139 valores e mistura dimensões: tipo de ato, matéria de
+política pública, evento processual e relação de autoria. A segmentação usa o de-para em
+`directives/familias_de_assunto.md`.
+
+- **Nunca deduza a família lendo a ementa.** Isso é inferência sobre texto livre, vedada
+  pelo item 5.3.3 da monografia. O rótulo oficial da Casa é o insumo.
+- Rótulo ausente do mapa recebe `NÃO CLASSIFICADO` e é reportado. **Não adivinhe.**
+- Incluir rótulo novo é decisão humana e se faz na diretriz, nunca no código.
+
+## 4. Conferência contra a fonte
+
+Reexecutar o pipeline não comprova veracidade: sendo determinístico, ele apenas concorda
+consigo mesmo. Quando a pergunta for sobre a correção de um número publicado, use
+`scripts_aux/conferir_parlamentar.py`, que reconta pela fonte sem reaproveitar o código do
+pipeline, ou confira o registro individual no serviço público da Casa.
+
+## 5. Ciclo de auditoria
 
 1. **Check:** verificar se existe diretriz em `directives/`.
 2. **Execute:** chamar scripts em `execution/`.
@@ -45,7 +63,7 @@ saiu dele.
 4. **Report:** gerar entregáveis limpos de dados sensíveis desnecessários, com as lacunas
    explicitamente declaradas.
 
-## 4. Auto-reparo (Self-Annealing)
+## 6. Auto-reparo (Self-Annealing)
 
 Se um portal de transparência ou API falhar, ou se o contrato de resposta divergir do esperado:
 
@@ -55,7 +73,7 @@ Se um portal de transparência ou API falhar, ou se o contrato de resposta diver
 - Atualize o script em `execution/`.
 - Documente a mudança na diretriz correspondente.
 
-## 5. Cortesia com servidores públicos
+## 7. Cortesia com servidores públicos
 
 Respeite os limites de concorrência e intervalo entre requisições definidos na diretriz
 aplicável. Falhas de conexão devem ser **registradas e contabilizadas**, nunca absorvidas

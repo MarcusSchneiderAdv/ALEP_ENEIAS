@@ -27,7 +27,11 @@ O critério não pergunta se a técnica é acurada. Pergunta **quem suporta o er
 
 - **Local:** `directives/`
 - **Conteúdo:** SOPs em Markdown que definem objetivos, limites legais (LGPD), parâmetros
-  técnicos e critérios de auditoria.
+  técnicos e critérios de auditoria. Inclui `familias_de_assunto.md`, o de-para entre os
+  rótulos de assunto atribuídos pela Casa e as famílias usadas na segmentação. O mapa é
+  diretriz, não código: vive em Markdown versionado e é conferível linha a linha por quem
+  não lê Python. Rótulo novo na origem vira `NÃO CLASSIFICADO` e é reportado na execução,
+  nunca adivinhado.
 - **Competência:** estritamente humana. O agente lê a diretriz e a ela se vincula; **não a
   redige nem a altera**. Um sistema que pudesse redefinir a própria finalidade tornaria
   inoperante o princípio da finalidade (LGPD, art. 6º, I).
@@ -62,14 +66,31 @@ O critério não pergunta se a técnica é acurada. Pergunta **quem suporta o er
 
 ## Ciclo de operação
 
-1. **Fase ENE — Extração Nativa.** Rotinas determinísticas consomem as APIs públicas oficiais
-   da ALEP (proposições, detalhes de tramitação, normas legais). Os dados brutos são
-   depositados na camada efêmera.
-2. **Fase IAS — Investigação supervisionada.** O agente interpreta os resultados das rotinas,
-   detecta divergências entre o contrato esperado e o contrato efetivo das APIs, e corrige a
-   Camada 3. **Interpreta resultados; nunca inventa dados.**
-3. **Entrega.** A consolidação serializa uma carga útil estática (`DADOS_ALEP_20.js`)
-   consumida diretamente pelo navegador, sem banco de dados em operação no servidor.
+O pipeline tem seis fases, orquestradas por `executar.py`. As fases 1 a 3 são de extração,
+a 4 é de adjudicação determinística, e as 5 e 6 preparam a entrega.
+
+1. **Ingestão** (`coletar_proposicoes_api.py`). Descarrega as proposições da legislatura,
+   ano a ano, para a camada efêmera.
+2. **Enriquecimento** (`coletar_detalhes_api.py`). Recupera, por proposição, o histórico de
+   tramitação e os vínculos normativos. A rotina é reentrante: preserva o já obtido e busca
+   apenas o ausente. A propriedade poupa os servidores do Estado e, pelo mesmo mecanismo,
+   não atualiza o que já existe, de modo que execuções parciais deixam o corpus com datas de
+   observação distintas. Para uniformizar, apaga-se `.tmp/raw_detalhes/` antes de executar.
+3. **Normas legais** (`coletar_normas_api.py`). Consolida a base de normas sancionadas, para
+   referência cruzada.
+4. **Consolidação** (`agrupar_dados_dashboard.py`). Fragmenta a autoria, segrega iniciativas
+   institucionais, classifica por espécie proposicional e por família de assunto, grava os
+   metadados de procedência e serializa a carga útil.
+5. **Dossiês** (`gerar_perfis.py`). Produz, em `dados/perfis/`, um arquivo por parlamentar,
+   um panorama da Casa e uma planilha consolidada, dimensionados para consulta em linguagem
+   natural com assistentes de IA. Descrevem; não qualificam.
+6. **Site** (`gerar_site.py`). Monta em `docs/` a versão hospedada do painel, com carga útil
+   reduzida pela omissão do histórico de tramitação, para publicação em hospedagem estática.
+
+**Conferência independente.** `scripts_aux/conferir_parlamentar.py` recontam os números
+contra a fonte sem reaproveitar o código do pipeline. Reexecutar o pipeline não comprova
+veracidade: sendo determinístico, ele apenas concorda consigo mesmo. A conferência vai à
+Assembleia por outra via e compara.
 
 ## Princípios
 

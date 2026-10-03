@@ -1,7 +1,11 @@
 # Dependencias do pipeline E.N.E.I.A.S.
+#
+# Sao as unicas externas. Todo o restante vem da biblioteca padrao, e vale
+# igualmente para as seis fases, para a conferencia independente e para os
+# scripts auxiliares.
 # Instalacao:  pip install -r requirements.txt
 #
-# Testado em Python 3.11.9 (Windows 10) em 22/08/2026.
+# Testado em Python 3.11.9 (Windows 10). Ultima verificacao: 03/10/2026.
 # Requer Python 3.6+ (f-strings) — recomendado 3.9+.
 
 requests>=2.31,<3
